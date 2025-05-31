@@ -2,11 +2,13 @@ version: '3.8'
 
 services:
   # MySQL Database
-  mysql:
+  salesapp-mysql:
     image: mysql:8.0
     container_name: salesapp-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: salesapp_user
+      MYSQL_PASSWORD: salesapp_password
       MYSQL_DATABASE: salesapp
     ports:
       - "3306:3306"
@@ -15,6 +17,12 @@ services:
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - salesapp-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Eureka Discovery Server
   eureka-discovery:
@@ -25,10 +33,11 @@ services:
     networks:
       - salesapp-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD", "curl", "-f", "http://localhost:8761"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Config Service
   config-service:
@@ -37,11 +46,19 @@ services:
     ports:
       - "8888:8888"
     depends_on:
-      - eureka-discovery
+      eureka-discovery:
+        condition: service_healthy
     environment:
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Auth Service
   auth-service:
@@ -50,13 +67,18 @@ services:
     ports:
       - "8085:8085"
     depends_on:
-      - mysql
-      - eureka-discovery
+      salesapp-mysql:
+        condition: service_healthy
+      eureka-discovery:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp
+      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
 
@@ -67,13 +89,18 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - mysql
-      - eureka-discovery
+      salesapp-mysql:
+        condition: service_healthy
+      eureka-discovery:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp_clients
+      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp_clients?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
 
@@ -84,13 +111,18 @@ services:
     ports:
       - "8082:8082"
     depends_on:
-      - mysql
-      - eureka-discovery
+      salesapp-mysql:
+        condition: service_healthy
+      eureka-discovery:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp_produits
+      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp_produits?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
 
@@ -101,13 +133,18 @@ services:
     ports:
       - "8484:8484"
     depends_on:
-      - mysql
-      - eureka-discovery
+      salesapp-mysql:
+        condition: service_healthy
+      eureka-discovery:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp_dispositifs
+      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp_dispositifs?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
 
@@ -118,13 +155,18 @@ services:
     ports:
       - "8383:8383"
     depends_on:
-      - mysql
-      - eureka-discovery
+      salesapp-mysql:
+        condition: service_healthy
+      eureka-discovery:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp_factures
+      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp_factures?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
 
@@ -135,13 +177,18 @@ services:
     ports:
       - "8282:8282"
     depends_on:
-      - mysql
-      - eureka-discovery
+      salesapp-mysql:
+        condition: service_healthy
+      eureka-discovery:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp_reglements
-      - SPRING_DATASOURCE_USERNAME=salesapp_user
-      - SPRING_DATASOURCE_PASSWORD=salesapp_password
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp_reglements?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
 
@@ -152,12 +199,19 @@ services:
     ports:
       - "8181:8181"
     depends_on:
-      - eureka-discovery
-      - auth-service
-      - client-service
-      - produit-service
+      eureka-discovery:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+      client-service:
+        condition: service_started
+      produit-service:
+        condition: service_started
     environment:
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
 

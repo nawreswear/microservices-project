@@ -1,15 +1,15 @@
-# Use official OpenJDK image as base
+# Build stage
+FROM maven:3.8.5-openjdk-17 AS build
+WORKDIR /app
+# Copy project files
+COPY pom.xml .
+COPY src ./src
+# Clean Maven cache and build
+RUN rm -rf /root/.m2/repository && mvn clean package -DskipTests --no-transfer-progress
+
+# Run stage
 FROM openjdk:17-jdk-slim
-
-# Set environment variable for the JAR file name
-ARG JAR_FILE=target/auth-service-1.0.0.jar
-
-# Copy JAR to the image
-COPY ${JAR_FILE} app.jar
-
-# Expose port (same as server.port)
+WORKDIR /app
+COPY --from=build /app/target/auth-service-1.0.0.jar app.jar
 EXPOSE 8085
-
-# Run the JAR file
-#ENTRYPOINT ["java", "-jar", "app.jar"]
-ENTRYPOINT ["java", "-cp", "app.jar", "com.salesapp.auth.AuthServiceApplication"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
