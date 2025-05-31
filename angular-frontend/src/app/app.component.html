@@ -1,0 +1,39 @@
+<!-- Layout principal avec sidebar -->
+<div class="app-container" 
+     *ngIf="!isLoginPage" 
+     [class.sidebar-open]="isSidebarOpen"
+     [class.sidebar-closed]="!isSidebarOpen"
+     [class.mobile]="isMobile">
+  
+  <!-- Backdrop pour mobile -->
+  <div class="sidebar-backdrop" 
+       *ngIf="isMobile && isSidebarOpen"
+       (click)="onSidebarBackdropClick()"></div>
+  
+  <!-- Sidebar container - REMOVED the click handler that was causing issues -->
+  <div class="sidebar-container" 
+       [class.open]="isSidebarOpen"
+       [class.closed]="!isSidebarOpen">
+    <app-sidebar (closeSidebar)="closeSidebar()"></app-sidebar>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="main-content">
+    <app-navbar (toggleSidebar)="toggleSidebar()" 
+                [isSidebarOpen]="isSidebarOpen"></app-navbar>
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+
+<!-- Layout pour les pages sans sidebar (login, etc.) -->
+<div class="auth-container" *ngIf="isLoginPage">
+  <router-outlet></router-outlet>
+</div>
+
+<!-- Loading overlay global -->
+<div class="global-loading" *ngIf="false">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Chargement...</div>
+</div>

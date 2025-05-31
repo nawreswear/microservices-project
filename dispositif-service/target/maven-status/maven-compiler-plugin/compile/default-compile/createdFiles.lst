@@ -1,0 +1,6 @@
+com\salesapp\dispositif\controller\DispositifController.class
+com\salesapp\dispositif\service\DispositifService.class
+com\salesapp\dispositif\repository\DispositifRepository.class
+com\salesapp\dispositif\DispositifServiceApplication.class
+com\salesapp\dispositif\model\Dispositif.class
+com\salesapp\dispositif\model\StatutDispositif.class

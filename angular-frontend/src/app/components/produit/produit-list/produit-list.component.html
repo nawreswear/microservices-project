@@ -1,0 +1,169 @@
+<div class="page-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <div class="page-title-wrapper">
+            <div class="page-icon">
+              <i class="fas fa-box-open"></i>
+            </div>
+            <div>
+              <h1 class="page-title">Gestion des Produits</h1>
+              <p class="page-subtitle">Gérez votre catalogue de produits informatiques</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 text-right">
+          <button
+            *ngIf="authService.isAdmin()"
+            class="btn btn-primary btn-lg btn-create"
+            (click)="onNew()">
+            <i class="fas fa-plus mr-2"></i>
+            Nouveau Produit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filters Section -->
+  <div class="filters-section">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-6 col-md-8">
+          <div class="search-wrapper">
+            <div class="search-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <input
+              type="text"
+              class="form-control search-input"
+              placeholder="Rechercher par nom, marque, modèle..."
+              [(ngModel)]="searchTerm"
+              (keyup.enter)="onSearch()"
+              (input)="onSearch()">
+            <button class="search-btn" type="button" (click)="onSearch()">
+              Rechercher
+            </button>
+          </div>
+        </div>
+        <div class="col-lg-6 col-md-4">
+          <div class="filter-actions">
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+                <i class="fas fa-filter mr-2"></i>Filtres
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#"><i class="fas fa-check-circle mr-2"></i>Produits actifs</a>
+                <a class="dropdown-item" href="#"><i class="fas fa-exclamation-triangle mr-2"></i>Stock faible</a>
+                <a class="dropdown-item" href="#"><i class="fas fa-times-circle mr-2"></i>Rupture de stock</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="content-section">
+    <div class="container-fluid">
+      <div *ngIf="loading" class="loading-state">
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Chargement des produits...</p>
+        </div>
+      </div>
+
+      <div *ngIf="!loading" class="products-grid">
+        <div class="row">
+          <div class="col-xl-4 col-lg-6 col-md-6 mb-4" *ngFor="let produit of filteredProduits">
+            <div class="product-card">
+              <div class="product-header">
+                <div class="product-status">
+                  <span class="status-badge" [ngClass]="{
+                    'status-active': produit.actif,
+                    'status-inactive': !produit.actif
+                  }">
+                    {{ produit.actif ? 'Actif' : 'Inactif' }}
+                  </span>
+                </div>
+                <div class="product-actions" *ngIf="authService.isAdmin()">
+                  <div class="dropdown">
+                    <button class="btn btn-sm btn-link dropdown-toggle" data-toggle="dropdown">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                      <a class="dropdown-item" (click)="onEdit(produit.id!)">
+                        <i class="fas fa-edit mr-2"></i>Modifier
+                      </a>
+                      <a class="dropdown-item text-danger" (click)="onDelete(produit.id!)">
+                        <i class="fas fa-trash mr-2"></i>Supprimer
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="product-body">
+                <div class="product-icon">
+                  <i class="fas fa-laptop"></i>
+                </div>
+                <h5 class="product-name">{{ produit.nom }}</h5>
+                <p class="product-description">{{ produit.description }}</p>
+                
+                <div class="product-details">
+                  <div class="detail-item">
+                    <span class="detail-label">Marque:</span>
+                    <span class="detail-value">{{ produit.marque }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Modèle:</span>
+                    <span class="detail-value">{{ produit.modele }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Catégorie:</span>
+                    <span class="detail-value">{{ produit.categorieName }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="product-footer">
+                <div class="price-section">
+                  <span class="price">{{ produit.prix | currency:'EUR':'symbol':'1.2-2' }}</span>
+                </div>
+                <div class="stock-section">
+                  <div class="stock-info">
+                    <span class="stock-label">Stock:</span>
+                    <span class="stock-value">{{ produit.quantiteStock }}</span>
+                  </div>
+                  <div class="stock-status">
+                    <span class="stock-badge" [ngClass]="{
+                      'stock-good': getStockStatus(produit) === 'success',
+                      'stock-warning': getStockStatus(produit) === 'warning',
+                      'stock-danger': getStockStatus(produit) === 'danger'
+                    }">
+                      {{ getStockText(produit) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="filteredProduits.length === 0" class="empty-state">
+          <div class="empty-icon">
+            <i class="fas fa-box-open"></i>
+          </div>
+          <h3>Aucun produit trouvé</h3>
+          <p>Essayez de modifier vos critères de recherche ou ajoutez un nouveau produit.</p>
+          <button class="btn btn-primary" (click)="onNew()" *ngIf="authService.isAdmin()">
+            <i class="fas fa-plus mr-2"></i>Ajouter un produit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

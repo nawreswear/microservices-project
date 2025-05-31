@@ -1,0 +1,145 @@
+<div class="factures-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <div class="page-title-wrapper">
+            <div class="page-icon">
+              <i class="fas fa-file-invoice"></i>
+            </div>
+            <div>
+              <h1 class="page-title">Gestion des Factures</h1>
+              <p class="page-subtitle">Gérez vos factures et suivez vos paiements</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 text-right">
+          <button
+            *ngIf="authService.isAdmin()"
+            class="btn btn-primary btn-lg btn-create"
+            (click)="onNew()">
+            <i class="fas fa-plus mr-2"></i>
+            Nouvelle Facture
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-6 col-md-8">
+          <div class="search-wrapper">
+            <div class="search-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <input
+              type="text"
+              class="form-control search-input"
+              placeholder="Rechercher une facture..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearch()">
+            <button class="search-btn" type="button" (click)="onSearch()">
+              Rechercher
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Factures List -->
+  <div class="content-section">
+    <div class="container-fluid">
+      <div *ngIf="loading" class="loading-state">
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Chargement des factures...</p>
+        </div>
+      </div>
+
+      <div *ngIf="!loading" class="factures-table">
+        <div class="table-card">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Numéro</th>
+                  <th>Client</th>
+                  <th>Date</th>
+                  <th>Échéance</th>
+                  <th>Montant HT</th>
+                  <th>Montant TTC</th>
+                  <th>Statut</th>
+                  <th *ngIf="authService.isAdmin()">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let facture of filteredFactures">
+                  <td>
+                    <span class="facture-number">{{ facture.numeroFacture }}</span>
+                  </td>
+                  <td>
+                    <div class="client-info">
+                      <div class="client-avatar">
+                        {{ facture.clientNom?.charAt(0) }}
+                      </div>
+                      <span>{{ facture.clientNom }}</span>
+                    </div>
+                  </td>
+                  <td>{{ facture.dateFacture | date:'short' }}</td>
+                  <td>{{ facture.dateEcheance | date:'short' }}</td>
+                  <td>{{ facture.montantHT | currency:'EUR':'symbol':'1.2-2' }}</td>
+                  <td>
+                    <span class="montant-ttc">{{ facture.montantTTC | currency:'EUR':'symbol':'1.2-2' }}</span>
+                  </td>
+                  <td>
+                    <span class="status-badge" [ngClass]="{
+                      'status-paid': facture.statut === 'PAYEE',
+                      'status-sent': facture.statut === 'ENVOYEE',
+                      'status-validated': facture.statut === 'VALIDEE',
+                      'status-draft': facture.statut === 'BROUILLON',
+                      'status-overdue': facture.statut === 'EN_RETARD'
+                    }">
+                      {{ facture.statut }}
+                    </span>
+                  </td>
+                  <td *ngIf="authService.isAdmin()">
+                    <div class="action-buttons">
+                      <button
+                        class="btn btn-sm btn-outline-primary"
+                        (click)="onEdit(facture.id!)"
+                        title="Modifier">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-outline-danger"
+                        (click)="onDelete(facture.id!)"
+                        title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div *ngIf="filteredFactures.length === 0" class="empty-state">
+              <div class="empty-icon">
+                <i class="fas fa-file-invoice"></i>
+              </div>
+              <h3>Aucune facture trouvée</h3>
+              <p>Commencez par créer votre première facture.</p>
+              <button class="btn btn-primary" (click)="onNew()" *ngIf="authService.isAdmin()">
+                <i class="fas fa-plus mr-2"></i>Créer une facture
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

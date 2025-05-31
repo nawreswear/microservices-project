@@ -1,0 +1,54 @@
+<nav class="navbar-modern">
+  <div class="container-fluid">
+    
+    <!-- Brand and Sidebar Toggle -->
+    <div class="navbar-brand-wrapper">
+      <!-- Sidebar toggle button -->
+      <button class="btn-toggle-sidebar"
+              (click)="onToggleSidebar()"
+              [attr.aria-label]="isSidebarOpen ? 'Close menu' : 'Open menu'">
+        <i class="fas fa-bars" *ngIf="!isSidebarOpen"></i>
+        <i class="fas fa-times" *ngIf="isSidebarOpen"></i>
+      </button>
+
+      <!-- Brand link -->
+      <a href="#" class="navbar-brand">
+        <i class="fas fa-chart-line"></i>
+        <span>FactureApp</span>
+      </a>
+    </div>
+
+    <!-- User Menu -->
+    <div class="navbar-actions">
+      <div class="user-menu dropdown">
+        <button class="btn-user dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+          <div class="user-avatar">JD</div>
+          <span class="user-name">John Doe</span>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li>
+            <a class="dropdown-item" href="#">
+              <i class="fas fa-user"></i> My Profile
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="#">
+              <i class="fas fa-cog"></i> Settings
+            </a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <a class="dropdown-item" href="#" (click)="onLogout()">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</nav>

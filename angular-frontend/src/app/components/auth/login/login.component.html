@@ -1,0 +1,67 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-icon">
+        <i class="fas fa-user-circle"></i>
+      </div>
+      <h2 class="login-title">Connexion</h2>
+      <p class="login-subtitle">Connectez-vous à votre compte</p>
+    </div>
+    
+    <div class="login-body">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-group-modern">
+          <label for="username" class="form-label-modern">
+            <i class="fas fa-user mr-2"></i>Nom d'utilisateur
+          </label>
+          <input
+            type="text"
+            id="username"
+            class="form-control-modern"
+            formControlName="username"
+            placeholder="Entrez votre nom d'utilisateur"
+            [class.is-invalid]="submitted && f.username.errors">
+          <div *ngIf="submitted && f.username.errors" class="invalid-feedback-modern">
+            <div *ngIf="f.username.errors.required">Le nom d'utilisateur est requis</div>
+          </div>
+        </div>
+
+        <div class="form-group-modern">
+          <label for="password" class="form-label-modern">
+            <i class="fas fa-lock mr-2"></i>Mot de passe
+          </label>
+          <input
+            type="password"
+            id="password"
+            class="form-control-modern"
+            formControlName="password"
+            placeholder="Entrez votre mot de passe"
+            [class.is-invalid]="submitted && f.password.errors">
+          <div *ngIf="submitted && f.password.errors" class="invalid-feedback-modern">
+            <div *ngIf="f.password.errors.required">Le mot de passe est requis</div>
+          </div>
+        </div>
+
+        <div *ngIf="error" class="alert alert-danger">
+          {{ error }}
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn btn-primary-modern btn-lg btn-block"
+          [disabled]="loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2"></span>
+          <i *ngIf="!loading" class="fas fa-sign-in-alt mr-2"></i>
+          {{ loading ? 'Connexion...' : 'Se connecter' }}
+        </button>
+      </form>
+    </div>
+
+    <div class="login-footer">
+      <p class="text-muted">
+        <i class="fas fa-info-circle mr-2"></i>
+        Utilisez vos identifiants pour accéder à l'application
+      </p>
+    </div>
+  </div>
+</div>

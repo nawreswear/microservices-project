@@ -1,0 +1,180 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: salesapp-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: salesapp
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - salesapp-network
+
+  # Eureka Discovery Server
+  eureka-discovery:
+    build: ./eureka-discovery
+    container_name: eureka-discovery
+    ports:
+      - "8761:8761"
+    networks:
+      - salesapp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Config Service
+  config-service:
+    build: ./config-service
+    container_name: config-service
+    ports:
+      - "8888:8888"
+    depends_on:
+      - eureka-discovery
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+    networks:
+      - salesapp-network
+
+  # Auth Service
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - mysql
+      - eureka-discovery
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+    networks:
+      - salesapp-network
+
+  # Client Service
+  client-service:
+    build: ./client-service
+    container_name: client-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+      - eureka-discovery
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp_clients
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+    networks:
+      - salesapp-network
+
+  # Product Service
+  produit-service:
+    build: ./produit-service
+    container_name: produit-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+      - eureka-discovery
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp_produits
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+    networks:
+      - salesapp-network
+
+  # Dispositif Service
+  dispositif-service:
+    build: ./dispositif-service
+    container_name: dispositif-service
+    ports:
+      - "8484:8484"
+    depends_on:
+      - mysql
+      - eureka-discovery
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp_dispositifs
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+    networks:
+      - salesapp-network
+
+  # Invoice (Facture) Service
+  facture-service:
+    build: ./facture-service
+    container_name: facture-service
+    ports:
+      - "8383:8383"
+    depends_on:
+      - mysql
+      - eureka-discovery
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp_factures
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+    networks:
+      - salesapp-network
+
+  # Payment (Reglement) Service
+  reglement-service:
+    build: ./reglement-service
+    container_name: reglement-service
+    ports:
+      - "8282:8282"
+    depends_on:
+      - mysql
+      - eureka-discovery
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/salesapp_reglements
+      - SPRING_DATASOURCE_USERNAME=salesapp_user
+      - SPRING_DATASOURCE_PASSWORD=salesapp_password
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+    networks:
+      - salesapp-network
+
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8181:8181"
+    depends_on:
+      - eureka-discovery
+      - auth-service
+      - client-service
+      - produit-service
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka
+    networks:
+      - salesapp-network
+
+  # Angular Frontend
+  angular-frontend:
+    build: ./angular-frontend
+    container_name: angular-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - salesapp-network
+
+volumes:
+  mysql_data:
+
+networks:
+  salesapp-network:
+    driver: bridge

@@ -1,0 +1,133 @@
+<div class="categories-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <div class="page-title-wrapper">
+            <div class="page-icon">
+              <i class="fas fa-tags"></i>
+            </div>
+            <div>
+              <h1 class="page-title">Gestion des Catégories</h1>
+              <p class="page-subtitle">Organisez vos produits par catégories</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 text-right">
+          <button
+            *ngIf="authService.isAdmin()"
+            class="btn btn-primary btn-lg btn-create"
+            (click)="onNew()">
+            <i class="fas fa-plus mr-2"></i>
+            Nouvelle Catégorie
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-6 col-md-8">
+          <div class="search-wrapper">
+            <div class="search-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <input
+              type="text"
+              class="form-control search-input"
+              placeholder="Rechercher une catégorie..."
+              [(ngModel)]="searchTerm">
+            <button class="search-btn" type="button">
+              Rechercher
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories Grid -->
+  <div class="content-section">
+    <div class="container-fluid">
+      <div *ngIf="loading" class="loading-state">
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Chargement des catégories...</p>
+        </div>
+      </div>
+
+      <div *ngIf="!loading" class="categories-grid">
+        <div class="row">
+          <div class="col-xl-4 col-lg-6 col-md-6 mb-4" *ngFor="let categorie of filteredCategories">
+            <div class="category-card">
+              <div class="category-header">
+                <div class="category-status">
+                  <span class="status-badge" [ngClass]="{
+                    'status-active': categorie.actif,
+                    'status-inactive': !categorie.actif
+                  }">
+                    {{ categorie.actif ? 'Active' : 'Inactive' }}
+                  </span>
+                </div>
+                <div class="category-actions" *ngIf="authService.isAdmin()">
+                  <div class="dropdown">
+                    <button class="btn btn-sm btn-link dropdown-toggle" data-toggle="dropdown">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                      <a class="dropdown-item" (click)="onEdit(categorie.id!)">
+                        <i class="fas fa-edit mr-2"></i>Modifier
+                      </a>
+                      <a class="dropdown-item text-danger" (click)="onDelete(categorie.id!)">
+                        <i class="fas fa-trash mr-2"></i>Supprimer
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="category-body">
+                <div class="category-icon">
+                  <i class="fas fa-folder"></i>
+                </div>
+                <h5 class="category-name">{{ categorie.nom }}</h5>
+                <p class="category-description">{{ categorie.description }}</p>
+                
+                <div class="category-meta">
+                  <div class="meta-item">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    <span>{{ categorie.dateCreation | date:'short' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="category-footer">
+                <div class="footer-stats">
+                  <div class="stat-item">
+                    <span class="stat-number">0</span>
+                    <span class="stat-label">Produits</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="filteredCategories.length === 0" class="empty-state">
+          <div class="empty-icon">
+            <i class="fas fa-tags"></i>
+          </div>
+          <h3>Aucune catégorie trouvée</h3>
+          <p>Commencez par créer votre première catégorie pour organiser vos produits.</p>
+          <button class="btn btn-primary" (click)="onNew()" *ngIf="authService.isAdmin()">
+            <i class="fas fa-plus mr-2"></i>Créer une catégorie
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

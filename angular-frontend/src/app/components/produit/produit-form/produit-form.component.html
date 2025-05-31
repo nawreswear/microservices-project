@@ -1,0 +1,271 @@
+<div class="form-container">
+  <div class="form-header">
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <div class="form-title-wrapper">
+            <div class="form-icon">
+              <i class="fas fa-{{ isEditMode ? 'edit' : 'plus' }}"></i>
+            </div>
+            <div>
+              <h1 class="form-title">{{ isEditMode ? 'Modifier le produit' : 'Nouveau produit' }}</h1>
+              <p class="form-subtitle">{{ isEditMode ? 'Modifiez les informations du produit' : 'Ajoutez un nouveau produit à votre catalogue' }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 text-right">
+          <button type="button" class="btn btn-outline-secondary btn-lg" (click)="onCancel()">
+            <i class="fas fa-times mr-2"></i>Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-content">
+    <div class="container-fluid">
+      <form [formGroup]="produitForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <!-- Informations générales -->
+          <div class="col-lg-6">
+            <div class="form-section">
+              <div class="section-header">
+                <div class="section-icon">
+                  <i class="fas fa-info-circle"></i>
+                </div>
+                <h3 class="section-title">Informations générales</h3>
+              </div>
+
+              <div class="form-group-modern">
+                <label for="nom" class="form-label-modern">
+                  <i class="fas fa-tag mr-2"></i>Nom du produit *
+                </label>
+                <input
+                  type="text"
+                  id="nom"
+                  class="form-control-modern"
+                  formControlName="nom"
+                  placeholder="Entrez le nom du produit"
+                  [class.is-invalid]="submitted && f.nom.errors">
+                <div *ngIf="submitted && f.nom.errors" class="invalid-feedback-modern">
+                  <div *ngIf="f.nom.errors.required">Le nom est requis</div>
+                  <div *ngIf="f.nom.errors.minlength">Le nom doit contenir au moins 2 caractères</div>
+                </div>
+              </div>
+
+              <div class="form-group-modern">
+                <label for="description" class="form-label-modern">
+                  <i class="fas fa-align-left mr-2"></i>Description *
+                </label>
+                <textarea
+                  id="description"
+                  class="form-control-modern"
+                  rows="4"
+                  formControlName="description"
+                  placeholder="Décrivez le produit en détail"
+                  [class.is-invalid]="submitted && f.description.errors"></textarea>
+                <div *ngIf="submitted && f.description.errors" class="invalid-feedback-modern">
+                  <div *ngIf="f.description.errors.required">La description est requise</div>
+                </div>
+              </div>
+
+              <div class="form-group-modern">
+                <label for="categorieId" class="form-label-modern">
+                  <i class="fas fa-folder mr-2"></i>Catégorie *
+                </label>
+                <select
+                  id="categorieId"
+                  class="form-control-modern"
+                  formControlName="categorieId"
+                  [class.is-invalid]="submitted && f.categorieId.errors">
+                  <option value="">Sélectionner une catégorie</option>
+                  <option *ngFor="let categorie of categories" [value]="categorie.id">
+                    {{ categorie.nom }}
+                  </option>
+                </select>
+                <div *ngIf="submitted && f.categorieId.errors" class="invalid-feedback-modern">
+                  <div *ngIf="f.categorieId.errors.required">La catégorie est requise</div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group-modern">
+                    <label for="marque" class="form-label-modern">
+                      <i class="fas fa-industry mr-2"></i>Marque *
+                    </label>
+                    <input
+                      type="text"
+                      id="marque"
+                      class="form-control-modern"
+                      formControlName="marque"
+                      placeholder="Ex: Dell, HP, Lenovo"
+                      [class.is-invalid]="submitted && f.marque.errors">
+                    <div *ngIf="submitted && f.marque.errors" class="invalid-feedback-modern">
+                      <div *ngIf="f.marque.errors.required">La marque est requise</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group-modern">
+                    <label for="modele" class="form-label-modern">
+                      <i class="fas fa-barcode mr-2"></i>Modèle *
+                    </label>
+                    <input
+                      type="text"
+                      id="modele"
+                      class="form-control-modern"
+                      formControlName="modele"
+                      placeholder="Ex: XPS 13, ThinkPad X1"
+                      [class.is-invalid]="submitted && f.modele.errors">
+                    <div *ngIf="submitted && f.modele.errors" class="invalid-feedback-modern">
+                      <div *ngIf="f.modele.errors.required">Le modèle est requis</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prix et stock -->
+          <div class="col-lg-6">
+            <div class="form-section">
+              <div class="section-header">
+                <div class="section-icon">
+                  <i class="fas fa-euro-sign"></i>
+                </div>
+                <h3 class="section-title">Prix et stock</h3>
+              </div>
+
+              <div class="form-group-modern">
+                <label for="prix" class="form-label-modern">
+                  <i class="fas fa-euro-sign mr-2"></i>Prix (€) *
+                </label>
+                <div class="input-group-modern">
+                  <input
+                    type="number"
+                    id="prix"
+                    class="form-control-modern"
+                    step="0.01"
+                    min="0"
+                    formControlName="prix"
+                    placeholder="0.00"
+                    [class.is-invalid]="submitted && f.prix.errors">
+                  <span class="input-group-text-modern">€</span>
+                </div>
+                <div *ngIf="submitted && f.prix.errors" class="invalid-feedback-modern">
+                  <div *ngIf="f.prix.errors.required">Le prix est requis</div>
+                  <div *ngIf="f.prix.errors.min">Le prix doit être positif</div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group-modern">
+                    <label for="quantiteStock" class="form-label-modern">
+                      <i class="fas fa-boxes mr-2"></i>Stock *
+                    </label>
+                    <input
+                      type="number"
+                      id="quantiteStock"
+                      class="form-control-modern"
+                      min="0"
+                      formControlName="quantiteStock"
+                      placeholder="0"
+                      [class.is-invalid]="submitted && f.quantiteStock.errors">
+                    <div *ngIf="submitted && f.quantiteStock.errors" class="invalid-feedback-modern">
+                      <div *ngIf="f.quantiteStock.errors.required">La quantité est requise</div>
+                      <div *ngIf="f.quantiteStock.errors.min">La quantité doit être positive</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group-modern">
+                    <label for="seuilAlerte" class="form-label-modern">
+                      <i class="fas fa-exclamation-triangle mr-2"></i>Seuil d'alerte *
+                    </label>
+                    <input
+                      type="number"
+                      id="seuilAlerte"
+                      class="form-control-modern"
+                      min="0"
+                      formControlName="seuilAlerte"
+                      placeholder="0"
+                      [class.is-invalid]="submitted && f.seuilAlerte.errors">
+                    <div *ngIf="submitted && f.seuilAlerte.errors" class="invalid-feedback-modern">
+                      <div *ngIf="f.seuilAlerte.errors.required">Le seuil est requis</div>
+                      <div *ngIf="f.seuilAlerte.errors.min">Le seuil doit être positif</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group-modern">
+                <label for="specifications" class="form-label-modern">
+                  <i class="fas fa-cogs mr-2"></i>Spécifications techniques
+                </label>
+                <textarea
+                  id="specifications"
+                  class="form-control-modern"
+                  rows="5"
+                  formControlName="specifications"
+                  placeholder="Processeur, RAM, Stockage, Carte graphique, etc."></textarea>
+              </div>
+
+              <div class="form-check-modern">
+                <input
+                  type="checkbox"
+                  id="actif"
+                  class="form-check-input-modern"
+                  formControlName="actif">
+                <label class="form-check-label-modern" for="actif">
+                  <i class="fas fa-toggle-on mr-2"></i>Produit actif
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <div class="row">
+            <div class="col-12">
+              <div class="actions-wrapper">
+                <div class="actions-info">
+                  <i class="fas fa-info-circle mr-2"></i>
+                  Les champs marqués d'un astérisque (*) sont obligatoires
+                </div>
+                <div class="actions-buttons">
+                  <button
+                    type="button"
+                    class="btn btn-secondary-modern btn-lg"
+                    (click)="onCancel()"
+                    [disabled]="loading">
+                    <i class="fas fa-times mr-2"></i>Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary-modern btn-lg"
+                    [disabled]="loading">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2"></span>
+                    <i *ngIf="!loading" class="fas fa-{{ isEditMode ? 'save' : 'plus' }} mr-2"></i>
+                    {{ isEditMode ? 'Modifier' : 'Créer' }} le produit
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div *ngIf="loading" class="loading-overlay-modern">
+  <div class="loading-content-modern">
+    <div class="loading-spinner-modern"></div>
+    <h4>{{ isEditMode ? 'Modification' : 'Création' }} en cours...</h4>
+    <p>Veuillez patienter</p>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<div class="sidebar">
+  <!-- Header -->
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <i class="fas fa-chart-line"></i>
+      <span class="sidebar-title">FactureApp</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item" *ngFor="let item of menuItems">
+        <a 
+          [routerLink]="item.route" 
+          class="nav-link"
+          [class.active]="isActive(item.route)"
+          (click)="onMenuClick()">
+          <i [class]="item.icon + ' nav-icon'"></i>
+          <span class="nav-text">{{ item.title }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
