@@ -1,10 +1,17 @@
 <div class="container">
   <div class="header">
     <h2>Gestion des Clients</h2>
-    <button mat-raised-button color="primary" (click)="addClient()" *ngIf="canEdit()">
-      <mat-icon>add</mat-icon>
-      Nouveau Client
-    </button>
+    <div class="button-group">
+      <button mat-raised-button color="primary" (click)="addClient()" *ngIf="canEdit()">
+        <mat-icon>add</mat-icon> Nouveau Client
+      </button>
+      <button mat-icon-button color="primary" (click)="refresh()" matTooltip="Actualiser">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button color="primary" (click)="exportToCSV()" matTooltip="Exporter en CSV">
+        <mat-icon>download</mat-icon>
+      </button>
+    </div>
   </div>
 
   <mat-card>
@@ -17,40 +24,44 @@
 
       <div class="table-container">
         <table mat-table [dataSource]="dataSource" matSort class="full-width">
+
           <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
-            <td mat-cell *matCellDef="let client">{{client.id}}</td>
+            <td mat-cell *matCellDef="let client">{{ client.id }}</td>
           </ng-container>
 
           <ng-container matColumnDef="nom">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
-            <td mat-cell *matCellDef="let client">{{client.nom}}</td>
+            <td mat-cell *matCellDef="let client">{{ client.nom }}</td>
           </ng-container>
 
           <ng-container matColumnDef="prenom">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Prénom</th>
-            <td mat-cell *matCellDef="let client">{{client.prenom}}</td>
+            <td mat-cell *matCellDef="let client">{{ client.prenom }}</td>
           </ng-container>
 
           <ng-container matColumnDef="email">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
-            <td mat-cell *matCellDef="let client">{{client.email}}</td>
+            <td mat-cell *matCellDef="let client">{{ client.email }}</td>
           </ng-container>
 
           <ng-container matColumnDef="telephone">
             <th mat-header-cell *matHeaderCellDef>Téléphone</th>
-            <td mat-cell *matCellDef="let client">{{client.telephone || '-'}}</td>
+            <td mat-cell *matCellDef="let client">{{ client.telephone || '-' }}</td>
           </ng-container>
 
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let client">
-              <button mat-icon-button color="primary" (click)="editClient(client)" 
-                      *ngIf="canEdit()" matTooltip="Modifier">
+              <button mat-icon-button color="accent" (click)="viewClient(client)" matTooltip="Voir détails">
+                <mat-icon>visibility</mat-icon>
+              </button>
+
+              <button mat-icon-button color="primary" (click)="editClient(client)" *ngIf="canEdit()" matTooltip="Modifier">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteClient(client)" 
-                      *ngIf="canDelete()" matTooltip="Supprimer">
+
+              <button mat-icon-button color="warn" (click)="deleteClient(client)" *ngIf="canDelete()" matTooltip="Supprimer">
                 <mat-icon>delete</mat-icon>
               </button>
             </td>

@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,7 +23,7 @@ import { LoginComponent } from './components/auth/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { NavbarComponent } from './components/navbar/navbar.component';      
 import { SidebarComponent } from './components/sidebar/sidebar.component';  
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // Client Components
 import { ClientListComponent } from './components/client/client-list/client-list.component';
 import { ClientFormComponent } from './components/client/client-form/client-form.component';
@@ -38,7 +39,7 @@ import { CategorieFormComponent } from './components/categorie/categorie-form/ca
 // Facture Components
 import { FactureListComponent } from './components/facture/facture-list/facture-list.component';
 import { FactureFormComponent } from './components/facture/facture-form/facture-form.component';
-
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 // Services
 import { AuthService } from './services/auth.service';
 import { ClientService } from './services/client.service';
@@ -74,7 +75,9 @@ import { APP_BASE_HREF } from '@angular/common';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     ReactiveFormsModule,
+    NoopAnimationsModule,
     FormsModule,
     HttpClientModule,
     AppRoutingModule,
@@ -84,6 +87,7 @@ import { APP_BASE_HREF } from '@angular/common';
     MatTableModule,
     MatPaginatorModule,
     MatButtonModule,
+    MatSnackBarModule,
     MatCardModule,
     MatProgressSpinnerModule,
     MatTooltipModule,

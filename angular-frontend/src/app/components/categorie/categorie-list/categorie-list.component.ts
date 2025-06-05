@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ProduitService } from '../../../services/produit.service';
-import { Categorie } from '../../../models/produit.model';
-import { AuthService } from '../../../services/auth.service';
+import { ProduitService } from 'src/app/services/produit.service';
+import { Categorie } from 'src/app/models/produit.model';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-categorie-list',
@@ -32,7 +32,7 @@ export class CategorieListComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des catégories:', error);
+        console.error('Error loading categories:', error);
         this.loading = false;
       }
     });
@@ -43,9 +43,15 @@ export class CategorieListComponent implements OnInit {
   }
 
   onDelete(id: number): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) {
-      // Implement delete logic here
-      console.log('Delete category:', id);
+    if (confirm('Are you sure you want to delete this category?')) {
+      this.produitService.deleteCategorie(id).subscribe({
+        next: () => {
+          this.loadCategories(); // Refresh list
+        },
+        error: (err) => {
+          console.error('Error deleting category:', err);
+        }
+      });
     }
   }
 
@@ -54,9 +60,7 @@ export class CategorieListComponent implements OnInit {
   }
 
   get filteredCategories(): Categorie[] {
-    if (!this.searchTerm) {
-      return this.categories;
-    }
+    if (!this.searchTerm) return this.categories;
     return this.categories.filter(categorie =>
       categorie.nom.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
       categorie.description.toLowerCase().includes(this.searchTerm.toLowerCase())

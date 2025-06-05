@@ -1,15 +1,11 @@
 version: '3.8'
 
 services:
-  # MySQL Database
   salesapp-mysql:
     image: mysql:8.0
     container_name: salesapp-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: salesapp_user
-      MYSQL_PASSWORD: salesapp_password
-      MYSQL_DATABASE: salesapp
     ports:
       - "3306:3306"
     volumes:
@@ -18,13 +14,13 @@ services:
     networks:
       - salesapp-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-proot"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
+    restart: unless-stopped
 
-  # Eureka Discovery Server
   eureka-discovery:
     build: ./eureka-discovery
     container_name: eureka-discovery
@@ -33,13 +29,13 @@ services:
     networks:
       - salesapp-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761"]
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
+    restart: unless-stopped
 
-  # Config Service
   config-service:
     build: ./config-service
     container_name: config-service
@@ -49,18 +45,18 @@ services:
       eureka-discovery:
         condition: service_healthy
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
       start_period: 30s
+    restart: unless-stopped
 
-  # Auth Service
   auth-service:
     build: ./auth-service
     container_name: auth-service
@@ -74,15 +70,15 @@ services:
       config-service:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:mysql://salesapp-mysql:3306/salesapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
+    restart: unless-stopped
 
-  # Client Service
   client-service:
     build: ./client-service
     container_name: client-service
@@ -96,15 +92,15 @@ services:
       config-service:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp_clients?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:mysql://salesapp-mysql:3306/salesapp_clients?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
+    restart: unless-stopped
 
-  # Product Service
   produit-service:
     build: ./produit-service
     container_name: produit-service
@@ -118,15 +114,15 @@ services:
       config-service:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp_produits?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:mysql://salesapp-mysql:3306/salesapp_produits?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
+    restart: unless-stopped
 
-  # Dispositif Service
   dispositif-service:
     build: ./dispositif-service
     container_name: dispositif-service
@@ -140,15 +136,15 @@ services:
       config-service:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp_dispositifs?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:mysql://salesapp-mysql:3306/salesapp_dispositifs?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
+    restart: unless-stopped
 
-  # Invoice (Facture) Service
   facture-service:
     build: ./facture-service
     container_name: facture-service
@@ -162,15 +158,15 @@ services:
       config-service:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp_factures?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:mysql://salesapp-mysql:3306/salesapp_factures?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
+    restart: unless-stopped
 
-  # Payment (Reglement) Service
   reglement-service:
     build: ./reglement-service
     container_name: reglement-service
@@ -184,15 +180,15 @@ services:
       config-service:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://salesapp-mysql:3306/salesapp_reglements?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:mysql://salesapp-mysql:3306/salesapp_reglements?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
+    restart: unless-stopped
 
-  # API Gateway
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway
@@ -203,31 +199,42 @@ services:
         condition: service_healthy
       config-service:
         condition: service_healthy
-      auth-service:
-        condition: service_started
-      client-service:
-        condition: service_started
-      produit-service:
-        condition: service_started
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-discovery:8761/eureka/
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-discovery:8761/eureka/
     networks:
       - salesapp-network
+    restart: unless-stopped
 
-  # Angular Frontend
   angular-frontend:
     build: ./angular-frontend
     container_name: angular-frontend
     ports:
       - "4200:80"
     depends_on:
-      - api-gateway
+      api-gateway:
+        condition: service_healthy
     networks:
       - salesapp-network
+    restart: unless-stopped
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8070:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: root
+    networks:
+      - salesapp-network
+    restart: unless-stopped
 
 volumes:
   mysql_data:
+  jenkins_home:
 
 networks:
   salesapp-network:

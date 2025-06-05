@@ -111,7 +111,7 @@ export class FactureFormComponent implements OnInit {
           ligneForm.patchValue(
             {
               nomDispositif: dispositif.nom,
-              prixUnitaire: dispositif.prix,
+              //prixUnitaire: dispositif.prix,
             },
             { emitEvent: false },
           )

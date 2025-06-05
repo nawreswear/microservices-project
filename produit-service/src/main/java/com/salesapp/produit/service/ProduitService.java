@@ -10,62 +10,64 @@ import java.util.Optional;
 
 @Service
 public class ProduitService {
-    
+
     @Autowired
     private ProduitRepository produitRepository;
-    
+
     public List<Produit> findAll() {
         return produitRepository.findAll();
     }
-    
+
     public Optional<Produit> findById(Long id) {
         return produitRepository.findById(id);
     }
-    
+
     public Produit save(Produit produit) {
         return produitRepository.save(produit);
     }
-    
+
     public void deleteById(Long id) {
         produitRepository.deleteById(id);
     }
-    
+
     public List<Produit> findByCategorieId(Long categorieId) {
         return produitRepository.findByCategorieId(categorieId);
     }
-    
+
     public List<Produit> findProduitsEnRuptureDeStock() {
         return produitRepository.findProduitsEnRuptureDeStock();
     }
-    
+
     public List<Produit> findByNomContaining(String nom) {
         return produitRepository.findByNomContaining(nom);
     }
-    
+
     public List<Produit> findByPrixBetween(Double prixMin, Double prixMax) {
         return produitRepository.findByPrixBetween(prixMin, prixMax);
     }
-    
-    public Produit updateStock(Long produitId, Integer nouvelleQuantite) {
-        Optional<Produit> optionalProduit = findById(produitId);
-        if (optionalProduit.isPresent()) {
-            Produit produit = optionalProduit.get();
-            produit.setStockDisponible(nouvelleQuantite);
-            return save(produit);
-        }
-        throw new RuntimeException("Produit non trouvé avec l'ID: " + produitId);
+
+    public List<Produit> findAllOrderByStockAsc() {
+        return produitRepository.findAllOrderByStockAsc();
     }
-    
+
+    public Produit updateStock(Long produitId, Integer nouvelleQuantite) {
+        return produitRepository.findById(produitId).map(produit -> {
+            produit.setStockDisponible(nouvelleQuantite);
+            return produitRepository.save(produit);
+        }).orElseThrow(() -> new RuntimeException("Produit non trouvé avec l'ID: " + produitId));
+    }
+
     public boolean reduireStock(Long produitId, Integer quantite) {
-        Optional<Produit> optionalProduit = findById(produitId);
+        Optional<Produit> optionalProduit = produitRepository.findById(produitId);
         if (optionalProduit.isPresent()) {
             Produit produit = optionalProduit.get();
             if (produit.getStockDisponible() >= quantite) {
                 produit.setStockDisponible(produit.getStockDisponible() - quantite);
-                save(produit);
+                produitRepository.save(produit);
                 return true;
             }
         }
         return false;
     }
 }
+

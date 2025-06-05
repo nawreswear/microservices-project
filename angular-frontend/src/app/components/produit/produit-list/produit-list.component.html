@@ -81,14 +81,7 @@
           <div class="col-xl-4 col-lg-6 col-md-6 mb-4" *ngFor="let produit of filteredProduits">
             <div class="product-card">
               <div class="product-header">
-                <div class="product-status">
-                  <span class="status-badge" [ngClass]="{
-                    'status-active': produit.actif,
-                    'status-inactive': !produit.actif
-                  }">
-                    {{ produit.actif ? 'Actif' : 'Inactif' }}
-                  </span>
-                </div>
+                
                 <div class="product-actions" *ngIf="authService.isAdmin()">
                   <div class="dropdown">
                     <button class="btn btn-sm btn-link dropdown-toggle" data-toggle="dropdown">
@@ -115,23 +108,23 @@
                 
                 <div class="product-details">
                   <div class="detail-item">
-                    <span class="detail-label">Marque:</span>
-                    <span class="detail-value">{{ produit.marque }}</span>
+                    <span class="detail-label">Description:</span>
+                    <span class="detail-value">{{ produit.description }}</span>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-label">Modèle:</span>
-                    <span class="detail-value">{{ produit.modele }}</span>
+                    <span class="detail-label">Nom:</span>
+                    <span class="detail-value">{{ produit.nom }}</span>
                   </div>
-                  <div class="detail-item">
+                  <!--<div class="detail-item">
                     <span class="detail-label">Catégorie:</span>
-                    <span class="detail-value">{{ produit.categorieName }}</span>
-                  </div>
+                    <span class="detail-value">{{ produit?.categorie_id?.nom }}</span>
+                  </div>-->
                 </div>
               </div>
 
               <div class="product-footer">
                 <div class="price-section">
-                  <span class="price">{{ produit.prix | currency:'EUR':'symbol':'1.2-2' }}</span>
+                  <span class="price">{{  produit.prix }} DT</span>
                 </div>
                 <div class="stock-section">
                   <div class="stock-info">

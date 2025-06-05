@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { Facture } from 'src/app/models/facture.model';
 import { AuthService } from 'src/app/services/auth.service';
-
+import { FactureService } from 'src/app/services/facture.service';
+import { ClientService } from 'src/app/services/client.service';
 
 @Component({
   selector: 'app-facture-list',
@@ -13,81 +13,186 @@ export class FactureListComponent implements OnInit {
   factures: Facture[] = [];
   filteredFactures: Facture[] = [];
   searchTerm: string = '';
-  loading = false;
+  loading: boolean = false;
+  errorMessage: string = '';
+
+  // Form handling
+  newFacture: Facture = this.getEmptyFacture();
+  editing: boolean = false;
+  showForm: boolean = false;
+
+  // Dropdown data
+  clientNames: string[] = [];
 
   constructor(
     public authService: AuthService,
-    private router: Router
-  ) { }
+    private factureService: FactureService,
+    private clientService: ClientService
+  ) {}
 
   ngOnInit(): void {
     this.loadFactures();
+    this.loadClientNames();
   }
 
+  /** Fetches all client names for the dropdown */
+  loadClientNames(): void {
+    this.clientService.getClients().subscribe({
+      next: (clients) => {
+        this.clientNames = clients.map(client => client.nom);
+      },
+      error: (err) => {
+        console.error('Failed to load client names', err);
+        this.clientNames = [];
+      }
+    });
+  }
+
+  /** Creates a new empty facture object */
+  getEmptyFacture(): Facture {
+    const now = new Date().toISOString();
+    return {
+      id: undefined,
+      numeroFacture: '',
+      clientId: 0,
+      clientNom: '',
+      dateFacture: now,
+      dateEcheance: undefined,
+      montantHT: 0,
+      montantTVA: 0,
+      montantTTC: 0,
+      tauxTVA: 20,
+      statut: 'BROUILLON',
+      lignes: [],
+      modePaiement: '',
+      observations: '',
+      dateCreation: undefined,
+      dateModification: undefined
+    };
+  }
+
+  /** Loads all factures from the backend */
   loadFactures(): void {
     this.loading = true;
-    
-    // Simulation de données pour le développement
-    setTimeout(() => {
-      this.factures = [
-        {
-          id: 1,
-          numeroFacture: 'FAC-2024-001',
-          dateFacture: new Date(),
-          dateEcheance: new Date(),
-          clientId: 1,
-          clientNom: 'Jean Dupont',
-          montantHT: 1000,
-          montantTVA: 200,
-          montantTTC: 1200,
-          tauxTVA: 20,
-          statut: 'PAYEE',
-          lignes: []
-        },
-        {
-          id: 2,
-          numeroFacture: 'FAC-2024-002',
-          dateFacture: new Date(),
-          dateEcheance: new Date(),
-          clientId: 2,
-          clientNom: 'Sophie Martin',
-          montantHT: 2000,
-          montantTVA: 400,
-          montantTTC: 2400,
-          tauxTVA: 20,
-          statut: 'ENVOYEE',
-          lignes: []
-        }
-      ];
-      
-      this.filteredFactures = this.factures;
-      this.loading = false;
-    }, 1000);
+    this.factureService.getFactures().subscribe({
+      next: (data) => {
+        this.factures = data;
+        this.filteredFactures = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load invoices.';
+        console.error(err);
+        this.loading = false;
+      }
+    });
   }
 
+  /** Filter factures by search term */
   onSearch(): void {
-    if (!this.searchTerm.trim()) {
-      this.filteredFactures = this.factures;
+    const term = this.searchTerm.toLowerCase().trim();
+    this.filteredFactures = term.length > 0 ? this.factures.filter(f =>
+      f.numeroFacture.toLowerCase().includes(term) ||
+      (f.clientNom && f.clientNom.toLowerCase().includes(term))
+    ) : this.factures;
+  }
+
+  /** Handles create or update form submission */
+  onSubmit(): void {
+    const now = new Date().toISOString();
+
+    // Calculate montantTVA and montantTTC based on montantHT and tauxTVA
+    const montantHT = this.newFacture.montantHT || 0;
+    const tauxTVA = this.newFacture.tauxTVA || 20;
+    const montantTVA = montantHT * (tauxTVA / 100);
+    const montantTTC = montantHT + montantTVA;
+
+    const payload: Facture = {
+      ...this.newFacture,
+      dateFacture: this.formatToDateTime(this.newFacture.dateFacture || now),
+      dateEcheance: this.newFacture.dateEcheance
+        ? this.formatToDateTime(this.newFacture.dateEcheance)
+        : undefined,
+      dateCreation: this.newFacture.dateCreation || now,
+      dateModification: now,
+      montantHT: montantHT,
+      montantTVA: montantTVA,
+      montantTTC: montantTTC,
+      modePaiement: this.newFacture.modePaiement || 'Inconnu',
+      observations: this.newFacture.observations || '',
+      tauxTVA: tauxTVA,
+      statut: this.newFacture.statut || 'BROUILLON'
+    };
+
+    if (this.editing) {
+      if (!this.newFacture.id) {
+        this.errorMessage = 'Invoice ID is missing for update.';
+        return;
+      }
+
+      this.factureService.updateFacture(this.newFacture.id, payload).subscribe({
+        next: () => {
+          this.loadFactures();
+          this.resetForm();
+        },
+        error: (err) => {
+          this.errorMessage = 'Failed to update invoice.';
+          console.error(err);
+        }
+      });
     } else {
-      this.filteredFactures = this.factures.filter(facture =>
-        facture.numeroFacture.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        (facture.clientNom && facture.clientNom.toLowerCase().includes(this.searchTerm.toLowerCase()))
-      );
+      this.factureService.createFacture(payload).subscribe({
+        next: () => {
+          this.loadFactures();
+          this.resetForm();
+        },
+        error: (err) => {
+          this.errorMessage = 'Failed to add invoice.';
+          console.error(err);
+        }
+      });
     }
   }
 
-  onNew(): void {
-    this.router.navigate(['/factures/new']);
+  /** Converts a date to ISO string */
+  formatToDateTime(dateInput: any): string {
+    const date = new Date(dateInput);
+    return date.toISOString();
   }
 
-  onEdit(id: number): void {
-    this.router.navigate(['/factures/edit', id]);
+  /** Enables edit mode for selected facture */
+  onEdit(facture: Facture): void {
+    this.newFacture = { ...facture };
+    this.showForm = true;
+    this.editing = true;
   }
 
+  /** Starts creating a new facture */
+  startCreate(): void {
+    this.newFacture = this.getEmptyFacture();
+    this.showForm = true;
+    this.editing = false;
+  }
+
+  /** Deletes a facture after confirmation */
   onDelete(id: number): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette facture ?')) {
-      this.factures = this.factures.filter(f => f.id !== id);
-      this.filteredFactures = this.filteredFactures.filter(f => f.id !== id);
+    const confirmed = confirm('Are you sure you want to delete this invoice?');
+    if (confirmed) {
+      this.factureService.deleteFacture(id).subscribe({
+        next: () => this.loadFactures(),
+        error: (err) => {
+          this.errorMessage = 'Failed to delete invoice.';
+          console.error(err);
+        }
+      });
     }
+  }
+
+  /** Resets the form and hides it */
+  resetForm(): void {
+    this.newFacture = this.getEmptyFacture();
+    this.editing = false;
+    this.showForm = false;
+    this.errorMessage = '';
   }
 }

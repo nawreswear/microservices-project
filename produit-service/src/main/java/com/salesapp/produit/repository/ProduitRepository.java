@@ -10,18 +10,20 @@ import java.util.List;
 
 @Repository
 public interface ProduitRepository extends JpaRepository<Produit, Long> {
-    
+
+    List<Produit> findByStockDisponible(int stockDisponible);
+
     List<Produit> findByCategorieId(Long categorieId);
-    
+
     @Query("SELECT p FROM Produit p WHERE p.stockDisponible <= p.stockMinimum")
     List<Produit> findProduitsEnRuptureDeStock();
-    
-    @Query("SELECT p FROM Produit p WHERE p.nom LIKE %:nom%")
+
+    @Query("SELECT p FROM Produit p WHERE LOWER(p.nom) LIKE LOWER(CONCAT('%', :nom, '%'))")
     List<Produit> findByNomContaining(@Param("nom") String nom);
-    
+
     @Query("SELECT p FROM Produit p ORDER BY p.stockDisponible ASC")
     List<Produit> findAllOrderByStockAsc();
-    
+
     @Query("SELECT p FROM Produit p WHERE p.prix BETWEEN :prixMin AND :prixMax")
     List<Produit> findByPrixBetween(@Param("prixMin") Double prixMin, @Param("prixMax") Double prixMax);
 }

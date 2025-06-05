@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class ClientService {
-  private apiUrl = 'http://localhost:8081/api/clients';
+  private apiUrl = `${environment.apiBaseUrl}/api/clients`;
 
   constructor(private http: HttpClient) {}
 
@@ -32,7 +32,31 @@ export class ClientService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  searchClients(terme: string): Observable<Client[]> {
-    return this.http.get<Client[]>(`${this.apiUrl}/recherche?terme=${terme}`);
+  // Search clients by 'nom' and 'prenom' parameters
+  searchClients(nom: string, prenom: string): Observable<Client[]> {
+    return this.http.get<Client[]>(`${this.apiUrl}/search?nom=${nom}&prenom=${prenom}`);
+  }
+
+  searchClientsByNom(nom: string): Observable<Client[]> {
+    return this.http.get<Client[]>(`${this.apiUrl}/search?nom=${nom}`);
+  }
+  // Get total revenue for a client
+  getChiffreAffaires(clientId: number): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/${clientId}/chiffre-affaires`);
+  }
+
+  // Get revenue by year for a client
+  getChiffreAffairesParAnnee(clientId: number, annee: number): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/${clientId}/chiffre-affaires/${annee}`);
+  }
+
+  // Get remaining amount to pay for a client
+  getResteAPayer(clientId: number): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/${clientId}/reste-a-payer`);
+  }
+
+  // Get loyal clients
+  getClientsPlusFideles(): Observable<Client[]> {
+    return this.http.get<Client[]>(`${this.apiUrl}/plus-fideles`);
   }
 }

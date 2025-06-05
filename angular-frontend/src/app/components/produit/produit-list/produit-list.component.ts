@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ProduitService } from '../../../services/produit.service';
-import { Produit } from '../../../models/produit.model';
+import { ProduitService } from 'src/app/services/produit.service';
+import { Produit } from 'src/app/models/produit.model';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -77,18 +77,18 @@ export class ProduitListComponent implements OnInit {
   }
 
   getStockStatus(produit: Produit): string {
-    if (produit.quantiteStock <= 0) {
+    if (produit.stock_disponible <= 0) {
       return 'danger';
-    } else if (produit.quantiteStock <= produit.seuilAlerte) {
+    } else if (produit.stock_disponible <= produit.stock_minimum) {
       return 'warning';
     }
     return 'success';
   }
 
   getStockText(produit: Produit): string {
-    if (produit.quantiteStock <= 0) {
+    if (produit.stock_disponible <= 0) {
       return 'Rupture';
-    } else if (produit.quantiteStock <= produit.seuilAlerte) {
+    } else if (produit.stock_disponible <= produit.stock_minimum) {
       return 'Stock faible';
     }
     return 'En stock';

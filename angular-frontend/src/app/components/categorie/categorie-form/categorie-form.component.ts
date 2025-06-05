@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Categorie } from '../../../models/produit.model';
+import { Categorie } from 'src/app/models/produit.model';
+import { ProduitService } from 'src/app/services/produit.service';
 
 @Component({
   selector: 'app-categorie-form',
@@ -18,17 +19,17 @@ export class CategorieFormComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private produitService: ProduitService
   ) {
     this.categorieForm = this.formBuilder.group({
       nom: ['', [Validators.required, Validators.minLength(2)]],
       description: ['', Validators.required],
-      actif: [true]
     });
   }
 
   ngOnInit(): void {
-    this.categorieId = this.route.snapshot.params['id'];
+    this.categorieId = +this.route.snapshot.params['id'];
     this.isEditMode = !!this.categorieId;
 
     if (this.isEditMode) {
@@ -37,26 +38,41 @@ export class CategorieFormComponent implements OnInit {
   }
 
   loadCategorie(): void {
-    // Implement load category logic here
-    console.log('Load category:', this.categorieId);
+    this.produitService.getCategorie(this.categorieId!).subscribe({
+      next: (categorie) => {
+        this.categorieForm.patchValue(categorie);
+      },
+      error: (err) => {
+        console.error('Error loading category:', err);
+        this.router.navigate(['/categories']);
+      }
+    });
   }
 
   onSubmit(): void {
     this.submitted = true;
-
-    if (this.categorieForm.invalid) {
-      return;
-    }
+    if (this.categorieForm.invalid) return;
 
     this.loading = true;
     const categorieData: Categorie = this.categorieForm.value;
 
-    // Implement save logic here
-    console.log('Save category:', categorieData);
-    
-    setTimeout(() => {
-      this.router.navigate(['/categories']);
-    }, 1000);
+    if (this.isEditMode) {
+      this.produitService.updateCategorie(this.categorieId!, categorieData).subscribe({
+        next: () => this.router.navigate(['/categories']),
+        error: (err) => {
+          console.error('Error updating category:', err);
+          this.loading = false;
+        }
+      });
+    } else {
+      this.produitService.createCategorie(categorieData).subscribe({
+        next: () => this.router.navigate(['/categories']),
+        error: (err) => {
+          console.error('Error creating category:', err);
+          this.loading = false;
+        }
+      });
+    }
   }
 
   onCancel(): void {

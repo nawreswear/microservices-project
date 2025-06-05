@@ -12,18 +12,24 @@ export class SidebarComponent {
   menuItems = [
     { title: "Tableau de bord", icon: "fas fa-tachometer-alt", route: "/dashboard" },
     { title: "Clients", icon: "fas fa-users", route: "/clients" },
+    { title: "Produits", icon: "fas fa-box", route: "/produits" },
+    { title: "Catégories", icon: "fas fa-tags", route: "/categories" },
     { title: "Factures", icon: "fas fa-file-invoice", route: "/factures" },
-    { title: "Dispositifs", icon: "fas fa-mobile-alt", route: "/dispositifs" },
-    { title: "Règlements", icon: "fas fa-credit-card", route: "/reglements" },
-    { title: "Rapports", icon: "fas fa-chart-bar", route: "/rapports" },
-    { title: "Paramètres", icon: "fas fa-cog", route: "/parametres" },
-  ]
+    { title: "Ajouter Client", icon: "fas fa-user-plus", route: "/clients/new" },
+    { title: "Ajouter Produit", icon: "fas fa-plus-square", route: "/produits/new" },
+    { title: "Ajouter Catégorie", icon: "fas fa-plus-circle", route: "/categories/new" },
+    { title: "Ajouter Facture", icon: "fas fa-file-invoice-dollar", route: "/factures/new" },
+    // Les routes "Dispositifs", "Règlements", "Rapports", "Paramètres" n'existent pas dans le routing actuel
+    // Elles doivent être retirées ou ajoutées dans AppRoutingModule
+  ];
+  
 
   constructor(private router: Router) {}
 
   isActive(route: string): boolean {
-    return this.router.url.includes(route)
+    return this.router.url.startsWith(route);
   }
+  
 
   onMenuClick() {
     // Fermer la sidebar sur mobile après clic

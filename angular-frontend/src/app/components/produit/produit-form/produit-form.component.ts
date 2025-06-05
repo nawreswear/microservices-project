@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ProduitService } from '../../../services/produit.service';
-import { Produit, Categorie } from '../../../models/produit.model';
+import { ProduitService } from 'src/app/services/produit.service';
+import { Produit, Categorie } from 'src/app/models/produit.model';
 
 @Component({
   selector: 'app-produit-form',
@@ -26,14 +26,11 @@ export class ProduitFormComponent implements OnInit {
     this.produitForm = this.formBuilder.group({
       nom: ['', [Validators.required, Validators.minLength(2)]],
       description: ['', Validators.required],
+      image_url: [''],
       prix: ['', [Validators.required, Validators.min(0)]],
-      categorieId: ['', Validators.required],
-      quantiteStock: ['', [Validators.required, Validators.min(0)]],
-      seuilAlerte: ['', [Validators.required, Validators.min(0)]],
-      marque: ['', Validators.required],
-      modele: ['', Validators.required],
-      specifications: [''],
-      actif: [true]
+      stock_disponible: ['', [Validators.required, Validators.min(0)]],
+      stock_minimum: ['', [Validators.required, Validators.min(0)]],
+      categorie_id: ['', Validators.required]
     });
   }
 
@@ -54,7 +51,7 @@ export class ProduitFormComponent implements OnInit {
         this.categories = categories;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des catégories:', error);
+        console.error('Error loading categories:', error);
       }
     });
   }
@@ -68,7 +65,7 @@ export class ProduitFormComponent implements OnInit {
           this.loading = false;
         },
         error: (error) => {
-          console.error('Erreur lors du chargement du produit:', error);
+          console.error('Error loading product:', error);
           this.loading = false;
         }
       });
@@ -94,7 +91,7 @@ export class ProduitFormComponent implements OnInit {
         this.router.navigate(['/produits']);
       },
       error: (error) => {
-        console.error('Erreur lors de la sauvegarde:', error);
+        console.error('Error saving product:', error);
         this.loading = false;
       }
     });
@@ -104,5 +101,7 @@ export class ProduitFormComponent implements OnInit {
     this.router.navigate(['/produits']);
   }
 
-  get f() { return this.produitForm.controls; }
+  get f() {
+    return this.produitForm.controls;
+  }
 }

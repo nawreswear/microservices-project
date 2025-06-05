@@ -16,77 +16,69 @@ public class FactureService {
     @Autowired
     private FactureRepository factureRepository;
 
-    public List<Facture> obtenirToutesLesFactures() {
+    public List<Facture> getAllFactures() {
         return factureRepository.findAll();
     }
 
-    public Optional<Facture> obtenirFactureParId(Long id) {
+    public Optional<Facture> getFactureById(Long id) {
         return factureRepository.findById(id);
     }
 
-    public Optional<Facture> obtenirFactureParNumero(String numeroFacture) {
+    public Optional<Facture> getFactureByNumero(String numeroFacture) {
         return factureRepository.findByNumeroFacture(numeroFacture);
     }
 
-    public Facture creerFacture(Facture facture) {
-        // Générer un numéro de facture unique si non fourni
-        if (facture.getNumeroFacture() == null || facture.getNumeroFacture().isEmpty()) {
-            facture.setNumeroFacture(genererNumeroFacture());
+    public Facture createFacture(Facture facture) {
+        if(facture.getMontantHT() == null) {
+            throw new IllegalArgumentException("Le montantHT est obligatoire");
         }
-
-        // Calculer les montants
-        facture.calculerMontants();
-
         return factureRepository.save(facture);
     }
 
-    public Facture mettreAJourFacture(Long id, Facture factureDetails) {
+    public Facture updateFacture(Long id, Facture updatedFacture) {
         return factureRepository.findById(id)
                 .map(facture -> {
-                    facture.setClientId(factureDetails.getClientId());
-                    facture.setDateFacture(factureDetails.getDateFacture());
-                    facture.setDateEcheance(factureDetails.getDateEcheance());
-                    facture.setStatut(factureDetails.getStatut());
-                    facture.setModePaiement(factureDetails.getModePaiement());
-                    facture.setObservations(factureDetails.getObservations());
-                    facture.setTauxTVA(factureDetails.getTauxTVA());
-                    facture.setLignes(factureDetails.getLignes());
-
-                    // Recalculer les montants
+                    facture.setClientId(updatedFacture.getClientId());
+                    facture.setDateFacture(updatedFacture.getDateFacture());
+                    facture.setDateEcheance(updatedFacture.getDateEcheance());
+                    facture.setStatut(updatedFacture.getStatut());
+                    facture.setModePaiement(updatedFacture.getModePaiement());
+                    facture.setObservations(updatedFacture.getObservations());
+                    facture.setTauxTVA(updatedFacture.getTauxTVA());
+                    facture.setLignes(updatedFacture.getLignes());
                     facture.calculerMontants();
-
                     return factureRepository.save(facture);
                 })
-                .orElseThrow(() -> new RuntimeException("Facture non trouvée avec l'id : " + id));
+                .orElseThrow(() -> new RuntimeException("Facture not found with ID: " + id));
     }
 
-    public void supprimerFacture(Long id) {
+    public void deleteFacture(Long id) {
         factureRepository.deleteById(id);
     }
 
-    public List<Facture> obtenirFacturesParClient(Long clientId) {
+    public List<Facture> getFacturesByClient(Long clientId) {
         return factureRepository.findByClientId(clientId);
     }
 
-    public List<Facture> obtenirFacturesParStatut(StatutFacture statut) {
+    public List<Facture> getFacturesByStatut(StatutFacture statut) {
         return factureRepository.findByStatut(statut);
     }
 
-    public List<Facture> obtenirFacturesParPeriode(LocalDateTime dateDebut, LocalDateTime dateFin) {
-        return factureRepository.findByDateFactureBetween(dateDebut, dateFin);
+    public List<Facture> getFacturesByPeriod(LocalDateTime start, LocalDateTime end) {
+        return factureRepository.findByDateFactureBetween(start, end);
     }
 
-    public List<Facture> obtenirFacturesEnRetard() {
+    public List<Facture> getOverdueFactures() {
         return factureRepository.findFacturesEnRetard(LocalDateTime.now());
     }
 
-    public Double calculerChiffreAffaires(LocalDateTime dateDebut, LocalDateTime dateFin) {
-        Double chiffre = factureRepository.calculerChiffreAffaires(dateDebut, dateFin);
-        return chiffre != null ? chiffre : 0.0;
+    public Double getChiffreAffaires(LocalDateTime start, LocalDateTime end) {
+        Double result = factureRepository.calculerChiffreAffaires(start, end);
+        return result != null ? result : 0.0;
     }
 
-    public boolean validerFacture(Long factureId) {
-        return factureRepository.findById(factureId)
+    public boolean validateFacture(Long id) {
+        return factureRepository.findById(id)
                 .map(facture -> {
                     if (facture.getStatut() == StatutFacture.BROUILLON) {
                         facture.setStatut(StatutFacture.VALIDEE);
@@ -98,8 +90,8 @@ public class FactureService {
                 .orElse(false);
     }
 
-    public boolean marquerCommePaye(Long factureId) {
-        return factureRepository.findById(factureId)
+    public boolean markAsPaid(Long id) {
+        return factureRepository.findById(id)
                 .map(facture -> {
                     facture.setStatut(StatutFacture.PAYEE);
                     factureRepository.save(facture);
@@ -108,14 +100,10 @@ public class FactureService {
                 .orElse(false);
     }
 
-    private String genererNumeroFacture() {
-        // Format: FAC-YYYYMMDD-XXXX
-        LocalDateTime maintenant = LocalDateTime.now();
+    private String generateNumeroFacture() {
+        LocalDateTime now = LocalDateTime.now();
         String dateStr = String.format("%04d%02d%02d",
-                maintenant.getYear(),
-                maintenant.getMonthValue(),
-                maintenant.getDayOfMonth());
-
+                now.getYear(), now.getMonthValue(), now.getDayOfMonth());
         long count = factureRepository.count() + 1;
         return String.format("FAC-%s-%04d", dateStr, count);
     }

@@ -3,15 +3,7 @@ export interface Client {
   nom: string;
   prenom: string;
   email: string;
-  telephone: string;
-  adresse: string;
-  ville: string;
-  codePostal: string;
-  pays: string;
-  dateNaissance?: Date;
-  typeClient: 'PARTICULIER' | 'ENTREPRISE';
-  numeroSiret?: string;
-  actif: boolean;
+  telephone?: string;
+  adresse?: string;
   dateCreation?: Date;
-  dateModification?: Date;
 }

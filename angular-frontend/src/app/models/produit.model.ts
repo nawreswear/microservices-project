@@ -1,21 +1,15 @@
 //import { Categorie } from './categorie.model';
-
 export interface Produit {
   id?: number;
   nom: string;
   description: string;
+  image_url?: string;
   prix: number;
-  categorieId: number;
-  categorieName?: string;
-  quantiteStock: number;
-  seuilAlerte: number;
-  marque: string;
-  modele: string;
-  specifications?: string;
-  actif: boolean;
-  dateCreation?: Date;
-  dateModification?: Date;
+  stock_disponible: number;
+  stock_minimum: number;
+  categorie_id: number;
 }
+
 
 export interface Categorie {
   id?: number;

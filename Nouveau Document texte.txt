@@ -1,0 +1,55 @@
+pipeline {
+  agent any
+
+  environment {
+    IMAGE_NAME = "salesapp"
+    REGISTRY = "docker.io/yourdockerhub"
+    BRANCH_NAME = "${env.BRANCH_NAME}"
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        git branch: "${BRANCH_NAME}", url: 'https://github.com/nawreswear/microservices-project.git'
+      }
+    }
+
+    stage('Build Maven Projects') {
+      steps {
+        sh 'mvn clean install -DskipTests'
+      }
+    }
+
+    stage('Build Docker Images') {
+      steps {
+        script {
+          def services = ['eureka-discovery', 'config-service', 'auth-service', 'client-service', 'produit-service', 'dispositif-service', 'facture-service', 'reglement-service']
+          services.each { service ->
+            sh "docker build -t ${REGISTRY}/${IMAGE_NAME}-${service}:latest ./${service}"
+          }
+        }
+      }
+    }
+
+    stage('Push Docker Images') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+          sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+          script {
+            def services = ['eureka-discovery', 'config-service', 'auth-service', 'client-service', 'produit-service', 'dispositif-service', 'facture-service', 'reglement-service']
+            services.each { service ->
+              sh "docker push ${REGISTRY}/${IMAGE_NAME}-${service}:latest"
+            }
+          }
+        }
+      }
+    }
+
+    stage('Deploy with Docker Compose') {
+      steps {
+        sh 'docker-compose down || true'
+        sh 'docker-compose up -d --build'
+      }
+    }
+  }
+}

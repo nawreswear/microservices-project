@@ -1,8 +1,5 @@
 export interface Categorie {
-  id?: number;
-  nom: string;
-  description: string;
-  actif: boolean;
-  dateCreation?: Date;
-  dateModification?: Date;
+  id?: number;                        // corresponds to Long id
+  nom: string;                        // required field (@NotBlank)
+  description?: string;              // optional, like in Produit                  // boolean status, matches Java boolean
 }

@@ -1,44 +1,45 @@
-<div class="container-fluid">
+<!--<div class="container-fluid">
   <div class="row">
     <div class="col-12">
       <div class="card shadow">
         <div class="card-header">
           <h5 class="card-title mb-0">
-            {{ isEditMode ? 'Modifier le client' : 'Nouveau client' }}
+            {{ isEditMode ? 'Edit Client' : 'New Client' }}
           </h5>
         </div>
+
         <div class="card-body">
+          <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
           <form [formGroup]="clientForm" (ngSubmit)="onSubmit()">
             <div class="row">
-              <!-- Informations personnelles -->
               <div class="col-md-6">
-                <h6 class="text-primary mb-3">Informations personnelles</h6>
-                
+                <h6 class="text-primary mb-3">Personal Info</h6>
+
                 <div class="form-group">
-                  <label for="nom">Nom *</label>
+                  <label for="nom">Last Name *</label>
                   <input
                     type="text"
                     id="nom"
                     class="form-control"
                     formControlName="nom"
-                    [class.is-invalid]="submitted && f.nom.errors">
+                    [class.is-invalid]="submitted && f.nom.errors" />
                   <div *ngIf="submitted && f.nom.errors" class="invalid-feedback">
-                    <div *ngIf="f.nom.errors.required">Le nom est requis</div>
-                    <div *ngIf="f.nom.errors.minlength">Le nom doit contenir au moins 2 caractères</div>
+                    <div *ngIf="f.nom.errors.required">Last name is required</div>
+                    <div *ngIf="f.nom.errors.minlength">Minimum 2 characters</div>
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label for="prenom">Prénom *</label>
+                  <label for="prenom">First Name *</label>
                   <input
                     type="text"
                     id="prenom"
                     class="form-control"
                     formControlName="prenom"
-                    [class.is-invalid]="submitted && f.prenom.errors">
+                    [class.is-invalid]="submitted && f.prenom.errors" />
                   <div *ngIf="submitted && f.prenom.errors" class="invalid-feedback">
-                    <div *ngIf="f.prenom.errors.required">Le prénom est requis</div>
-                    <div *ngIf="f.prenom.errors.minlength">Le prénom doit contenir au moins 2 caractères</div>
+                    <div *ngIf="f.prenom.errors.required">First name is required</div>
+                    <div *ngIf="f.prenom.errors.minlength">Minimum 2 characters</div>
                   </div>
                 </div>
 
@@ -49,152 +50,141 @@
                     id="email"
                     class="form-control"
                     formControlName="email"
-                    [class.is-invalid]="submitted && f.email.errors">
+                    [class.is-invalid]="submitted && f.email.errors" />
                   <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
-                    <div *ngIf="f.email.errors.required">L'email est requis</div>
-                    <div *ngIf="f.email.errors.email">Format d'email invalide</div>
+                    <div *ngIf="f.email.errors.required">Email is required</div>
+                    <div *ngIf="f.email.errors.email">Invalid email format</div>
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label for="telephone">Téléphone *</label>
+                  <label for="telephone">Phone</label>
                   <input
                     type="tel"
                     id="telephone"
                     class="form-control"
                     formControlName="telephone"
-                    [class.is-invalid]="submitted && f.telephone.errors">
+                    [class.is-invalid]="submitted && f.telephone.errors" />
                   <div *ngIf="submitted && f.telephone.errors" class="invalid-feedback">
-                    <div *ngIf="f.telephone.errors.required">Le téléphone est requis</div>
-                    <div *ngIf="f.telephone.errors.pattern">Format de téléphone invalide</div>
+                    <div *ngIf="f.telephone.errors.pattern">Invalid format (e.g., +21690123456)</div>
                   </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="dateNaissance">Date de naissance</label>
-                  <input
-                    type="date"
-                    id="dateNaissance"
-                    class="form-control"
-                    formControlName="dateNaissance">
                 </div>
               </div>
 
-              <!-- Adresse et informations complémentaires -->
               <div class="col-md-6">
-                <h6 class="text-primary mb-3">Adresse</h6>
-                
+                <h6 class="text-primary mb-3">Address Info</h6>
+
                 <div class="form-group">
-                  <label for="adresse">Adresse *</label>
+                  <label for="adresse">Address</label>
                   <textarea
                     id="adresse"
-                    class="form-control"
                     rows="3"
-                    formControlName="adresse"
-                    [class.is-invalid]="submitted && f.adresse.errors"></textarea>
-                  <div *ngIf="submitted && f.adresse.errors" class="invalid-feedback">
-                    <div *ngIf="f.adresse.errors.required">L'adresse est requise</div>
-                  </div>
+                    class="form-control"
+                    formControlName="adresse"></textarea>
                 </div>
 
                 <div class="form-group">
-                  <label for="ville">Ville *</label>
+                  <label for="dateCreation">Creation Date</label>
                   <input
                     type="text"
-                    id="ville"
+                    id="dateCreation"
                     class="form-control"
-                    formControlName="ville"
-                    [class.is-invalid]="submitted && f.ville.errors">
-                  <div *ngIf="submitted && f.ville.errors" class="invalid-feedback">
-                    <div *ngIf="f.ville.errors.required">La ville est requise</div>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="codePostal">Code postal *</label>
-                  <input
-                    type="text"
-                    id="codePostal"
-                    class="form-control"
-                    formControlName="codePostal"
-                    [class.is-invalid]="submitted && f.codePostal.errors">
-                  <div *ngIf="submitted && f.codePostal.errors" class="invalid-feedback">
-                    <div *ngIf="f.codePostal.errors.required">Le code postal est requis</div>
-                    <div *ngIf="f.codePostal.errors.pattern">Le code postal doit contenir 5 chiffres</div>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="pays">Pays *</label>
-                  <input
-                    type="text"
-                    id="pays"
-                    class="form-control"
-                    formControlName="pays"
-                    [class.is-invalid]="submitted && f.pays.errors">
-                  <div *ngIf="submitted && f.pays.errors" class="invalid-feedback">
-                    <div *ngIf="f.pays.errors.required">Le pays est requis</div>
-                  </div>
-                </div>
-
-                <h6 class="text-primary mb-3 mt-4">Type de client</h6>
-                
-                <div class="form-group">
-                  <label for="typeClient">Type de client *</label>
-                  <select
-                    id="typeClient"
-                    class="form-control"
-                    formControlName="typeClient">
-                    <option value="PARTICULIER">Particulier</option>
-                    <option value="ENTREPRISE">Entreprise</option>
-                  </select>
-                </div>
-
-                <div class="form-group" *ngIf="clientForm.get('typeClient') && clientForm.get('typeClient').value === 'ENTREPRISE'">
-                  <label for="numeroSiret">Numéro SIRET *</label>
-                  <input
-                    type="text"
-                    id="numeroSiret"
-                    class="form-control"
-                    formControlName="numeroSiret"
-                    [class.is-invalid]="submitted && f.numeroSiret.errors">
-                  <div *ngIf="submitted && f.numeroSiret.errors" class="invalid-feedback">
-                    <div *ngIf="f.numeroSiret.errors.required">Le numéro SIRET est requis pour les entreprises</div>
-                    <div *ngIf="f.numeroSiret.errors.pattern">Le numéro SIRET doit contenir 14 chiffres</div>
-                  </div>
-                </div>
-
-                <div class="form-check">
-                  <input
-                    type="checkbox"
-                    id="actif"
-                    class="form-check-input"
-                    formControlName="actif">
-                  <label class="form-check-label" for="actif">
-                    Client actif
-                  </label>
+                    formControlName="dateCreation"
+                    readonly />
                 </div>
               </div>
             </div>
 
             <div class="row mt-4">
-              <div class="col-12">
-                <div class="d-flex justify-content-end">
-                  <button
-                    type="button"
-                    class="btn btn-secondary mr-2"
-                    (click)="onCancel()"
-                    [disabled]="loading">
-                    Annuler
-                  </button>
-                  <button
-                    type="submit"
-                    class="btn btn-primary"
-                    [disabled]="loading">
-                    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2"></span>
-                    {{ isEditMode ? 'Modifier' : 'Créer' }}
-                  </button>
+              <div class="col-12 d-flex justify-content-end">
+                <button
+                  type="button"
+                  class="btn btn-secondary me-2"
+                  (click)="onCancel()"
+                  [disabled]="loading">
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="loading">
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+                  {{ isEditMode ? 'Update' : 'Submit' }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>-->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            {{ isEditMode ? 'Edit Client' : 'New Client' }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+          <form [formGroup]="clientForm" (ngSubmit)="onSubmit()">
+            <div class="row">
+              <div class="col-md-6">
+                <h6 class="text-primary mb-3">Personal Info</h6>
+                <div class="form-group">
+                  <label for="nom">Last Name *</label>
+                  <input type="text" id="nom" class="form-control" formControlName="nom" [class.is-invalid]="submitted && f.nom.errors" />
+                  <div *ngIf="submitted && f.nom.errors" class="invalid-feedback">
+                    <div *ngIf="f.nom.errors.required">Last name is required</div>
+                    <div *ngIf="f.nom.errors.minlength">Minimum 2 characters</div>
+                  </div>
                 </div>
+                <div class="form-group">
+                  <label for="prenom">First Name *</label>
+                  <input type="text" id="prenom" class="form-control" formControlName="prenom" [class.is-invalid]="submitted && f.prenom.errors" />
+                  <div *ngIf="submitted && f.prenom.errors" class="invalid-feedback">
+                    <div *ngIf="f.prenom.errors.required">First name is required</div>
+                    <div *ngIf="f.prenom.errors.minlength">Minimum 2 characters</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="email">Email *</label>
+                  <input type="email" id="email" class="form-control" formControlName="email" [class.is-invalid]="submitted && f.email.errors" />
+                  <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+                    <div *ngIf="f.email.errors.required">Email is required</div>
+                    <div *ngIf="f.email.errors.email">Invalid email format</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="telephone">Phone</label>
+                  <input type="tel" id="telephone" class="form-control" formControlName="telephone" [class.is-invalid]="submitted && f.telephone.errors" />
+                  <div *ngIf="submitted && f.telephone.errors" class="invalid-feedback">
+                    <div *ngIf="f.telephone.errors.pattern">Invalid format (e.g., +21690123456)</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-primary mb-3">Address Info</h6>
+                <div class="form-group">
+                  <label for="adresse">Address</label>
+                  <textarea id="adresse" rows="3" class="form-control" formControlName="adresse"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="dateCreation">Creation Date</label>
+                  <input type="text" id="dateCreation" class="form-control" formControlName="dateCreation" readonly />
+                </div>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-12 d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary me-2" (click)="onCancel()" [disabled]="loading">Cancel</button>
+                <button type="submit" class="btn btn-primary" [disabled]="loading">
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+                  {{ isEditMode ? 'Update' : 'Submit' }}
+                </button>
               </div>
             </div>
           </form>
