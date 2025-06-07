@@ -1,4 +1,4 @@
-# Use official OpenJDK 17 runtime
+# Use official OpenJDK 17 runtime image
 FROM openjdk:17-jdk-slim
 
 # Set working directory inside container

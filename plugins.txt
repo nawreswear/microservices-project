@@ -1,0 +1,16 @@
+# Plugin dependencies with specific versions (API & utility plugins)
+commons-lang3-api:3.12.0-36.vd97de6465d5b
+commons-text-api:1.10.0-27.vb_8b_e0b_35c3a_3
+plugin-util-api:3.7.0
+font-awesome-api:6.4.0-1
+jquery3-api:3.6.0-2
+
+# Main Jenkins pipeline and Git plugins
+docker-workflow
+git
+blueocean
+workflow-aggregator
+credentials-binding
+pipeline-github-lib
+pipeline-stage-view
+pipeline-model-definition

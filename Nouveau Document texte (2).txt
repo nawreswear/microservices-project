@@ -123,6 +123,23 @@ services:
       - salesapp-network
     restart: unless-stopped
 
+  divice-service:
+    build: ./divice-service
+    container_name: divice-service
+    depends_on:
+      - salesapp-mysql
+      - eureka-discovery
+      - config-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://salesapp-mysql:3306/salesapp_divices?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-discovery:8761/eureka/
+    networks:
+      - salesapp-network
+    restart: unless-stopped
+
   facture-service:
     build: ./facture-service
     container_name: facture-service

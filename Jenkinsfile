@@ -2,35 +2,31 @@ pipeline {
     agent any
 
     tools {
-        jdk 'jdk'              // JDK configured in Jenkins
-        git 'git'              // Git installation configured in Jenkins
-        maven 'maven'          // Maven installation configured in Jenkins
-        nodejs 'nodejs'        // Node.js installation for Angular frontend
+        jdk 'jdk'          // Your configured JDK name in Jenkins
+        // maven 'maven'   // Uncomment if you have Maven configured
+        git 'git'          // Your configured Git installation
     }
 
     environment {
         DOCKER_REGISTRY = "microservices-sales-app"
-        BUILD_TAG = "${env.BUILD_NUMBER}"   // Unique tag per Jenkins build
     }
 
     stages {
-
         stage('Clone Repository') {
             steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/master']],
+                checkout([$class: 'GitSCM',
+                    branches: [[name: 'master']],
                     doGenerateSubmoduleConfigurations: false,
                     extensions: [],
                     userRemoteConfigs: [[
                         url: 'https://github.com/nawreswear/microservices-project.git',
-                        credentialsId: 'github-creds'
+                        credentialsId: 'github-creds'   // Use your Jenkins Git credentials ID here
                     ]]
                 ])
             }
         }
 
-        stage('Build Maven Services') {
+        stage('Build Maven Projects') {
             steps {
                 script {
                     def services = [
@@ -47,22 +43,8 @@ pipeline {
 
                     services.each { service ->
                         dir(service) {
-                            echo "🔧 Building ${service}..."
                             sh 'mvn clean package -DskipTests'
                         }
-                    }
-                }
-            }
-        }
-
-        stage('Build Angular Frontend') {
-            steps {
-                dir('angular-frontend') {
-                    echo "🛠 Installing dependencies and building Angular app..."
-                    retry(3) {
-                        sh 'npm install'
-                        // Handle OpenSSL errors for Node.js 18+
-                        sh 'NODE_OPTIONS=--openssl-legacy-provider npm run build'
                     }
                 }
             }
@@ -71,7 +53,7 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 script {
-                    def components = [
+                    def services = [
                         "auth-service",
                         "client-service",
                         "produit-service",
@@ -84,20 +66,15 @@ pipeline {
                         "angular-frontend"
                     ]
 
-                    components.each { service ->
-                        echo "🐳 Building Docker image for ${service}..."
-                        sh """
-                            docker build -t ${DOCKER_REGISTRY}/${service}:${BUILD_TAG} ./${service}
-                            docker tag ${DOCKER_REGISTRY}/${service}:${BUILD_TAG} ${DOCKER_REGISTRY}/${service}:latest
-                        """
+                    services.each { service ->
+                        sh "docker build -t ${DOCKER_REGISTRY}/${service}:latest ./${service}"
                     }
                 }
             }
         }
 
-        stage('Start with Docker Compose') {
+        stage('Start Docker Compose') {
             steps {
-                echo "🚀 Starting application with Docker Compose..."
                 sh 'docker-compose down || true'
                 sh 'docker-compose up -d --build'
             }
@@ -110,9 +87,6 @@ pipeline {
         }
         failure {
             echo "❌ Pipeline failed!"
-        }
-        always {
-            echo "📦 Jenkins build finished. Check Docker containers if needed."
         }
     }
 }

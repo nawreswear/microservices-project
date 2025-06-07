@@ -17,7 +17,7 @@ COPY . .
 ENV NODE_OPTIONS=--openssl-legacy-provider
 
 # Build de l'application Angular en mode production
-RUN npm run build -- --configuration production
+RUN npm run build 
 
 # Stage 2: Serve the application with Nginx
 FROM nginx:1.25

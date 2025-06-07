@@ -1,22 +1,17 @@
+server:
+  port: 8080
+
 spring:
-  application:
-    name: facture-service
   datasource:
-    url: jdbc:mysql://localhost:3306/salesapp_factures?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: root
+    url: jdbc:mysql://localhost:3306/mydb
+    username: myuser
+    password: mypassword
     driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      maximum-pool-size: 10
 
   jpa:
+    show-sql: true  # ✅ moved here (not inside hibernate)
     hibernate:
-      ddl-auto: update   # ou validate / create / create-drop selon usage
-    show-sql: true
+      ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-
-server:
-  port: 8383
-
+        dialect: org.hibernate.dialect.MySQL5Dialect
