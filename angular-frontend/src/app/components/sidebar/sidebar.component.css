@@ -182,7 +182,10 @@
   position: relative;
   z-index: 1;
 }
-
+.sidebar {
+  height: 100vh;        /* Prendre toute la hauteur de la fenêtre */
+  overflow-y: auto;     /* Activer le scroll vertical */
+}
 /* ===== COLLAPSED STATE ===== */
 .sidebar.collapsed {
   width: 70px;
