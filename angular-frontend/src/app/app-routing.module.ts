@@ -10,6 +10,8 @@ import { CategorieListComponent } from './components/categorie/categorie-list/ca
 import { CategorieFormComponent } from './components/categorie/categorie-form/categorie-form.component';
 import { FactureListComponent } from './components/facture/facture-list/facture-list.component';
 import { FactureFormComponent } from './components/facture/facture-form/facture-form.component';
+import { ReglementListComponent } from './components/reglement/reglement-list/reglement-list.component';
+import { DeviseListComponent } from './components/devise/devise-list/devise-list.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -27,6 +29,8 @@ const routes: Routes = [
   { path: 'factures', component: FactureListComponent },
   { path: 'factures/new', component: FactureFormComponent },
   { path: 'factures/edit/:id', component: FactureFormComponent },
+   { path: 'reglements', component: ReglementListComponent },
+   { path: 'devises', component: DeviseListComponent },
   { path: '**', redirectTo: '/dashboard' }
 ];
 

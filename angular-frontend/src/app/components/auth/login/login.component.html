@@ -1,67 +1,129 @@
 <div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <div class="login-icon">
-        <i class="fas fa-user-circle"></i>
+  <div class="login-background">
+    <div class="background-overlay"></div>
+  </div>
+  
+  <div class="login-content">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo">
+          <div class="logo-icon">🏢</div>
+          <h1>Gestion Commerciale</h1>
+        </div>
+        <p class="welcome-text">Connectez-vous à votre espace</p>
       </div>
-      <h2 class="login-title">Connexion</h2>
-      <p class="login-subtitle">Connectez-vous à votre compte</p>
-    </div>
-    
-    <div class="login-body">
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <div class="form-group-modern">
-          <label for="username" class="form-label-modern">
-            <i class="fas fa-user mr-2"></i>Nom d'utilisateur
+
+      <!-- Message d'erreur -->
+      <div *ngIf="error" class="alert alert-danger" role="alert">
+        <div class="alert-content">
+          <span class="alert-icon">⚠️</span>
+          <span class="alert-message">{{ error }}</span>
+          <button type="button" class="alert-close" (click)="clearError()">×</button>
+        </div>
+      </div>
+
+      <!-- Formulaire de connexion -->
+      <form (ngSubmit)="onSubmit()" class="login-form" novalidate>
+        <div class="form-group">
+          <label for="username" class="form-label">
+            <span class="label-icon">👤</span>
+            Nom d'utilisateur
           </label>
-          <input
-            type="text"
-            id="username"
-            class="form-control-modern"
-            formControlName="username"
-            placeholder="Entrez votre nom d'utilisateur"
-            [class.is-invalid]="submitted && f.username.errors">
-          <div *ngIf="submitted && f.username.errors" class="invalid-feedback-modern">
-            <div *ngIf="f.username.errors.required">Le nom d'utilisateur est requis</div>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              id="username"
+              name="username"
+              class="form-control"
+              [(ngModel)]="loginRequest.username"
+              (input)="onUsernameChange()"
+              placeholder="Entrez votre nom d'utilisateur"
+              autocomplete="username"
+              required
+              [class.is-invalid]="error && !loginRequest.username">
+            <span class="input-icon">👤</span>
           </div>
         </div>
 
-        <div class="form-group-modern">
-          <label for="password" class="form-label-modern">
-            <i class="fas fa-lock mr-2"></i>Mot de passe
+        <div class="form-group">
+          <label for="password" class="form-label">
+            <span class="label-icon">🔒</span>
+            Mot de passe
           </label>
-          <input
-            type="password"
-            id="password"
-            class="form-control-modern"
-            formControlName="password"
-            placeholder="Entrez votre mot de passe"
-            [class.is-invalid]="submitted && f.password.errors">
-          <div *ngIf="submitted && f.password.errors" class="invalid-feedback-modern">
-            <div *ngIf="f.password.errors.required">Le mot de passe est requis</div>
+          <div class="input-wrapper">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              name="password"
+              class="form-control"
+              [(ngModel)]="loginRequest.password"
+              (input)="onPasswordChange()"
+              placeholder="Entrez votre mot de passe"
+              autocomplete="current-password"
+              required
+              [class.is-invalid]="error && !loginRequest.password">
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="togglePasswordVisibility()"
+              [title]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
           </div>
         </div>
 
-        <div *ngIf="error" class="alert alert-danger">
-          {{ error }}
+        <div class="form-options">
+          <label class="checkbox-wrapper">
+            <input
+              type="checkbox"
+              [(ngModel)]="rememberMe"
+              name="rememberMe">
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Se souvenir de moi</span>
+          </label>
+          <a href="#" class="forgot-password">Mot de passe oublié ?</a>
         </div>
 
-        <button 
-          type="submit" 
-          class="btn btn-primary-modern btn-lg btn-block"
-          [disabled]="loading">
-          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2"></span>
-          <i *ngIf="!loading" class="fas fa-sign-in-alt mr-2"></i>
-          {{ loading ? 'Connexion...' : 'Se connecter' }}
+        <button
+          type="submit"
+          class="btn btn-primary btn-login"
+          [disabled]="loading || !loginRequest.username || !loginRequest.password">
+          <span *ngIf="loading" class="spinner"></span>
+          <span class="btn-text">
+            {{ loading ? 'Connexion en cours...' : 'Se connecter' }}
+          </span>
         </button>
       </form>
-    </div>
 
-    <div class="login-footer">
-      <p class="text-muted">
-        <i class="fas fa-info-circle mr-2"></i>
-        Utilisez vos identifiants pour accéder à l'application
-      </p>
+      <!-- Comptes de démonstration -->
+      <div class="demo-section">
+        <div class="demo-divider">
+          <span>Comptes de démonstration</span>
+        </div>
+        <div class="demo-buttons">
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-demo"
+            (click)="loginAsDemo('admin')"
+            [disabled]="loading">
+            <span class="demo-icon">👑</span>
+            Administrateur
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-demo"
+            (click)="loginAsDemo('user')"
+            [disabled]="loading">
+            <span class="demo-icon">👤</span>
+            Utilisateur
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="login-footer">
+        <p>&copy; 2025 Gestion Commerciale. Tous droits réservés.</p>
+      </div>
     </div>
   </div>
 </div>

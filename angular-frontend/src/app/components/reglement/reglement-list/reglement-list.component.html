@@ -1,0 +1,291 @@
+<div class="container">
+  <div class="header-section">
+    <h2>Gestion des Règlements</h2>
+    <button class="btn btn-primary" (click)="showForm = !showForm; isEditing = false; resetForm()">
+      <i class="icon-plus"></i>
+      Nouveau Règlement
+    </button>
+  </div>
+
+  <!-- Messages d'alerte -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''">×</button>
+  </div>
+
+  <div *ngIf="success" class="alert alert-success alert-dismissible">
+    {{ success }}
+    <button type="button" class="btn-close" (click)="success = ''">×</button>
+  </div>
+
+  <!-- Formulaire de création/modification -->
+  <div *ngIf="showForm" class="card form-card">
+    <div class="card-header">
+      <h3>{{ isEditing ? 'Modifier le règlement' : 'Nouveau règlement' }}</h3>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="isEditing ? updateReglement() : createReglement()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="numeroReglement" class="form-label">Numéro de règlement *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="numeroReglement" 
+              [(ngModel)]="isEditing ? editingReglement!.numeroReglement : newReglement.numeroReglement" 
+              name="numeroReglement" 
+              placeholder="REG-2024-001" 
+              required>
+          </div>
+          <div class="form-group">
+            <label for="factureId" class="form-label">ID Facture *</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="factureId" 
+              [(ngModel)]="isEditing ? editingReglement!.factureId : newReglement.factureId" 
+              name="factureId" 
+              placeholder="1" 
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="numeroFacture" class="form-label">Numéro de facture</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="numeroFacture" 
+              [(ngModel)]="isEditing ? editingReglement!.numeroFacture : newReglement.numeroFacture" 
+              name="numeroFacture" 
+              placeholder="FACT-2024-001">
+          </div>
+          <div class="form-group">
+            <label for="clientId" class="form-label">ID Client *</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="clientId" 
+              [(ngModel)]="isEditing ? editingReglement!.clientId : newReglement.clientId" 
+              name="clientId" 
+              placeholder="1" 
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="montantRegle" class="form-label">Montant réglé *</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="montantRegle" 
+              [(ngModel)]="isEditing ? editingReglement!.montantRegle : newReglement.montantRegle" 
+              name="montantRegle" 
+              step="0.01" 
+              min="0" 
+              placeholder="1000.00" 
+              required>
+          </div>
+          <div class="form-group">
+            <label for="dateReglement" class="form-label">Date de règlement *</label>
+            <input 
+              type="date" 
+              class="form-control" 
+              id="dateReglement" 
+              [(ngModel)]="isEditing ? editingReglement!.dateReglement : newReglement.dateReglement" 
+              name="dateReglement" 
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="modePaiement" class="form-label">Mode de paiement *</label>
+            <select 
+              class="form-control" 
+              id="modePaiement" 
+              [(ngModel)]="isEditing ? editingReglement!.modePaiement : newReglement.modePaiement" 
+              name="modePaiement" 
+              required>
+              <option *ngFor="let mode of modesPaiement" [value]="mode">{{ mode }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="statut" class="form-label">Statut *</label>
+            <select 
+              class="form-control" 
+              id="statut" 
+              [(ngModel)]="isEditing ? editingReglement!.statut : newReglement.statut" 
+              name="statut" 
+              required>
+              <option *ngFor="let statut of statutsReglement" [value]="statut">{{ statut }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="referenceTransaction" class="form-label">Référence transaction</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="referenceTransaction" 
+              [(ngModel)]="isEditing ? editingReglement!.referenceTransaction : newReglement.referenceTransaction" 
+              name="referenceTransaction" 
+              placeholder="TXN123456">
+          </div>
+          <div class="form-group">
+            <label for="numeroCheque" class="form-label">Numéro de chèque</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="numeroCheque" 
+              [(ngModel)]="isEditing ? editingReglement!.numeroCheque : newReglement.numeroCheque" 
+              name="numeroCheque" 
+              placeholder="CHQ123456">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
+            {{ isEditing ? 'Mettre à jour' : 'Créer' }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="card filters-card">
+    <div class="card-header">
+      <h3>Filtres</h3>
+    </div>
+    <div class="card-body">
+      <div class="filters-row">
+        <div class="filter-group">
+          <label class="form-label">Recherche</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            [(ngModel)]="searchTerm" 
+            (ngModelChange)="applyFilters()" 
+            placeholder="Numéro règlement ou facture...">
+        </div>
+        <div class="filter-group">
+          <label class="form-label">Statut</label>
+          <select class="form-control" [(ngModel)]="filterStatut" (ngModelChange)="applyFilters()">
+            <option value="">Tous les statuts</option>
+            <option *ngFor="let statut of statutsReglement" [value]="statut">{{ statut }}</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="form-label">Mode de paiement</label>
+          <select class="form-control" [(ngModel)]="filterMode" (ngModelChange)="applyFilters()">
+            <option value="">Tous les modes</option>
+            <option *ngFor="let mode of modesPaiement" [value]="mode">{{ mode }}</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="form-label">Date début</label>
+          <input 
+            type="date" 
+            class="form-control" 
+            [(ngModel)]="filterDateDebut" 
+            (ngModelChange)="applyFilters()">
+        </div>
+        <div class="filter-group">
+          <label class="form-label">Date fin</label>
+          <input 
+            type="date" 
+            class="form-control" 
+            [(ngModel)]="filterDateFin" 
+            (ngModelChange)="applyFilters()">
+        </div>
+        <div class="filter-actions">
+          <button class="btn btn-outline-secondary" (click)="clearFilters()">
+            Effacer
+          </button>
+          <button class="btn btn-outline-primary" (click)="loadReglements()" [disabled]="loading">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
+            Actualiser
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des règlements -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Liste des règlements ({{ filteredReglements.length }})</h3>
+    </div>
+    <div class="card-body">
+      <div *ngIf="loading && reglements.length === 0" class="loading-container">
+        <div class="spinner-border"></div>
+        <p>Chargement des règlements...</p>
+      </div>
+      
+      <div *ngIf="!loading && filteredReglements.length === 0" class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h4>Aucun règlement trouvé</h4>
+        <p>{{ reglements.length === 0 ? 'Commencez par créer votre premier règlement.' : 'Aucun règlement ne correspond aux critères de recherche.' }}</p>
+      </div>
+      
+      <div *ngIf="filteredReglements.length > 0" class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>N° Règlement</th>
+              <th>N° Facture</th>
+              <th>Client ID</th>
+              <th>Montant</th>
+              <th>Date</th>
+              <th>Mode</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let reglement of filteredReglements">
+              <td class="font-weight-bold">{{ reglement.numeroReglement }}</td>
+              <td>{{ reglement.numeroFacture || '-' }}</td>
+              <td>{{ reglement.clientId }}</td>
+              <td class="amount">{{ reglement.montantRegle | number:'1.2-2' }} €</td>
+              <td>{{ reglement.dateReglement | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span class="badge" [ngClass]="getModeClass(reglement.modePaiement)">
+                  {{ reglement.modePaiement }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getStatutClass(reglement.statut)">
+                  {{ reglement.statut }}
+                </span>
+              </td>
+              <td class="actions">
+                <button 
+                  class="btn btn-sm btn-outline-primary" 
+                  (click)="editReglement(reglement)"
+                  title="Modifier">
+                 ✏️
+                </button>
+                <button 
+                  class="btn btn-sm btn-outline-danger" 
+                  (click)="deleteReglement(reglement.id!)"
+                  title="Supprimer">
+                  🗑️
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

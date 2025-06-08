@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class ClientService {
-  private apiUrl = `${environment.apiBaseUrl}/api/clients`;
+  private apiUrl = `http://localhost:8081/api/clients`;
 
   constructor(private http: HttpClient) {}
 
@@ -36,7 +36,7 @@ export class ClientService {
   searchClients(nom: string, prenom: string): Observable<Client[]> {
     return this.http.get<Client[]>(`${this.apiUrl}/search?nom=${nom}&prenom=${prenom}`);
   }
-
+ // Search clients by 'nom' 
   searchClientsByNom(nom: string): Observable<Client[]> {
     return this.http.get<Client[]>(`${this.apiUrl}/search?nom=${nom}`);
   }

@@ -56,6 +56,8 @@ import { AuthInterceptor } from './interceptor/auth.interceptor';
 import { DispositifService } from './services/dispositif.service';
 import { AppRoutingModule } from './app-routing.module';
 import { APP_BASE_HREF } from '@angular/common';
+import { ReglementListComponent } from './components/reglement/reglement-list/reglement-list.component';
+import { DeviseListComponent } from './components/devise/devise-list/devise-list.component';
 
 @NgModule({
   declarations: [
@@ -71,7 +73,9 @@ import { APP_BASE_HREF } from '@angular/common';
     FactureListComponent,
     FactureFormComponent,
     NavbarComponent,
-    SidebarComponent
+    SidebarComponent,
+    ReglementListComponent,
+    DeviseListComponent,
   ],
   imports: [
     BrowserModule,

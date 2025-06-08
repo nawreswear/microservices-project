@@ -1,0 +1,80 @@
+<div class="container">
+  <h2>Currency Management</h2>
+
+  <!-- Alert messages -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ success }}
+    <button type="button" class="btn-close" (click)="success = ''"></button>
+  </div>
+
+  <!-- Create new currency form -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Add New Currency</h3>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="createDevise()">
+        <div class="mb-3">
+          <label for="code" class="form-label">Code</label>
+          <input type="text" class="form-control" id="code" [(ngModel)]="newDevise.code" name="code" placeholder="e.g., USD" required>
+        </div>
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" class="form-control" id="name" [(ngModel)]="newDevise.name" name="name" placeholder="e.g., US Dollar" required>
+        </div>
+        <div class="mb-3">
+          <label for="exchangeRate" class="form-label">Exchange Rate</label>
+          <input type="number" class="form-control" id="exchangeRate" [(ngModel)]="newDevise.exchangeRate" name="exchangeRate" step="0.0001" min="0" placeholder="e.g., 1.1234" required>
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Add
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Currency list -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3>Currency List</h3>
+      <button class="btn btn-outline-primary" (click)="loadDevises()" [disabled]="loading">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Refresh
+      </button>
+    </div>
+    <div class="card-body">
+      <div *ngIf="loading && devises.length === 0" class="text-center p-3">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && devises.length === 0" class="alert alert-info">
+        No currencies available.
+      </div>
+
+      <table *ngIf="devises.length > 0" class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Exchange Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let devise of devises">
+            <td>{{ devise.code }}</td>
+            <td>{{ devise.name }}</td>
+            <td>{{ devise.exchangeRate | number:'1.4-4' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
