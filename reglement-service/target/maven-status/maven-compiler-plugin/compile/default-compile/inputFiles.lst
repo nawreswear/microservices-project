@@ -3,5 +3,6 @@ D:\dev\Micro-Service\Workspace\microservices-sales-app\reglement-service\src\mai
 D:\dev\Micro-Service\Workspace\microservices-sales-app\reglement-service\src\main\java\com\salesapp\reglement\controller\ReglementController.java
 D:\dev\Micro-Service\Workspace\microservices-sales-app\reglement-service\src\main\java\com\salesapp\reglement\ReglementServiceApplication.java
 D:\dev\Micro-Service\Workspace\microservices-sales-app\reglement-service\src\main\java\com\salesapp\reglement\repository\ReglementRepository.java
+D:\dev\Micro-Service\Workspace\microservices-sales-app\reglement-service\src\main\java\com\salesapp\reglement\config\CorsConfig.java
 D:\dev\Micro-Service\Workspace\microservices-sales-app\reglement-service\src\main\java\com\salesapp\reglement\model\Reglement.java
 D:\dev\Micro-Service\Workspace\microservices-sales-app\reglement-service\src\main\java\com\salesapp\reglement\model\StatutReglement.java

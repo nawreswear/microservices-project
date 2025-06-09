@@ -1,14 +1,16 @@
 server:
-  port: 8087 
+  port: 8087
 
 spring:
   application:
     name: devise-service
+
   datasource:
     url: jdbc:mysql://localhost:3306/salesapp_devises
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -28,4 +30,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include:
+          - health
+          - info
+          - metrics

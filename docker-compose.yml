@@ -78,7 +78,7 @@ services:
     build: ./client-service
     container_name: client-service
     ports:
-      - "8082:8082"
+      - "8081:8081"
     depends_on:
       - salesapp-mysql
       - eureka-discovery
@@ -97,7 +97,7 @@ services:
     build: ./produit-service
     container_name: produit-service
     ports:
-      - "8083:8083"
+      - "8082:8082"
     depends_on:
       - salesapp-mysql
       - eureka-discovery
@@ -135,7 +135,7 @@ services:
     build: ./facture-service
     container_name: facture-service
     ports:
-      - "8084:8084"
+      - "8383:8383"
     depends_on:
       - salesapp-mysql
       - eureka-discovery
@@ -154,13 +154,32 @@ services:
     build: ./reglement-service
     container_name: reglement-service
     ports:
-      - "8086:8086"
+      - "8282:8282"
     depends_on:
       - salesapp-mysql
       - eureka-discovery
       - config-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://salesapp-mysql:3306/salesapp_reglements?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-discovery:8761/eureka/
+    networks:
+      - salesapp-network
+    restart: unless-stopped
+
+  devise-service:
+    build: ./devise-service
+    container_name: devise-service
+    ports:
+      - "8087:8087"
+    depends_on:
+      - salesapp-mysql
+      - eureka-discovery
+      - config-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://salesapp-mysql:3306/salesapp_devises?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_PROFILES_ACTIVE: docker

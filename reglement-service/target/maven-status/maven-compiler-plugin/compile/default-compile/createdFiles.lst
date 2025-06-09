@@ -3,5 +3,7 @@ com\salesapp\reglement\model\ModePaiement.class
 com\salesapp\reglement\service\ReglementService.class
 com\salesapp\reglement\ReglementServiceApplication.class
 com\salesapp\reglement\controller\ReglementController.class
+com\salesapp\reglement\config\CorsConfig$1.class
 com\salesapp\reglement\model\StatutReglement.class
+com\salesapp\reglement\config\CorsConfig.class
 com\salesapp\reglement\repository\ReglementRepository.class

@@ -4,11 +4,11 @@ FROM openjdk:17-jdk-slim
 # Set working directory inside container
 WORKDIR /app
 
-# Copy the built jar file into the container
+# Copy the JAR file from the build output
 COPY target/reglement-service-1.0.0.jar app.jar
 
-# Expose port 8282
+# Expose the service port
 EXPOSE 8282
 
-# Run the application
+# Start the Java application
 ENTRYPOINT ["java", "-jar", "app.jar"]

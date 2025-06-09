@@ -24,10 +24,10 @@ public interface FactureRepository extends JpaRepository<Facture, Long> {
     List<Facture> findByDateFactureBetween(@Param("dateDebut") LocalDateTime dateDebut,
                                            @Param("dateFin") LocalDateTime dateFin);
 
-    @Query("SELECT f FROM Facture f WHERE f.dateEcheance < :maintenant AND f.statut = 'ENVOYEE'")
+    @Query("SELECT f FROM Facture f WHERE f.dateEcheance < :maintenant AND f.statut = 'ENVOYE'")
     List<Facture> findFacturesEnRetard(@Param("maintenant") LocalDateTime maintenant);
 
-    @Query("SELECT SUM(f.montantTTC) FROM Facture f WHERE f.statut = 'PAYEE' AND f.dateFacture BETWEEN :dateDebut AND :dateFin")
+    @Query("SELECT SUM(f.montantTTC) FROM Facture f WHERE f.statut = 'PAYE' AND f.dateFacture BETWEEN :dateDebut AND :dateFin")
     Double calculerChiffreAffaires(@Param("dateDebut") LocalDateTime dateDebut,
                                    @Param("dateFin") LocalDateTime dateFin);
 }

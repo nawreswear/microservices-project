@@ -2,7 +2,9 @@ package com.salesapp.facture.model;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "factures")
@@ -25,15 +27,15 @@ public class Facture {
     private LocalDateTime dateEcheance;
 
     @Column(name = "montant_ht", nullable = false)
-    private Double montantHT;
+    private Double montantHT = 0.0;
 
     @Column(name = "montant_tva", nullable = false)
-    private Double montantTVA;
+    private Double montantTVA = 0.0;
 
     @Column(name = "montant_ttc", nullable = false)
-    private Double montantTTC;
+    private Double montantTTC = 0.0;
 
-    @Column(name = "taux_tva")
+    @Column(name = "taux_tva", nullable = false)
     private Double tauxTVA = 20.0; // 20% par défaut
 
     @Enumerated(EnumType.STRING)
@@ -45,27 +47,29 @@ public class Facture {
 
     private String observations;
 
-    @OneToMany(mappedBy = "facture", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LigneFacture> lignes;
+    @OneToMany(mappedBy = "facture", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<LigneFacture> lignes = new ArrayList<>();
 
-    @Column(name = "date_creation")
+    @Column(name = "date_creation", nullable = false, updatable = false)
     private LocalDateTime dateCreation;
 
     @Column(name = "date_modification")
     private LocalDateTime dateModification;
 
     // Constructeurs
-    public Facture() {}
-
-    public Facture(String numeroFacture, Long clientId) {
-        this.numeroFacture = numeroFacture;
-        this.clientId = clientId;
+    public Facture() {
         this.dateFacture = LocalDateTime.now();
         this.statut = StatutFacture.BROUILLON;
-        this.dateCreation = LocalDateTime.now();
+    }
+
+    public Facture(String numeroFacture, Long clientId) {
+        this();
+        this.numeroFacture = numeroFacture;
+        this.clientId = clientId;
     }
 
     // Getters et Setters
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -102,18 +106,29 @@ public class Facture {
     public String getObservations() { return observations; }
     public void setObservations(String observations) { this.observations = observations; }
 
+    public void setDateModification(LocalDateTime dateModification) {
+        this.dateModification = dateModification;
+    }
+
     public List<LigneFacture> getLignes() { return lignes; }
-    public void setLignes(List<LigneFacture> lignes) { this.lignes = lignes; }
+    public void setLignes(List<LigneFacture> lignes) {
+        this.lignes.clear();
+        if (lignes != null) {
+            this.lignes.addAll(lignes);
+            // Assurer la cohérence bidirectionnelle
+            this.lignes.forEach(l -> l.setFacture(this));
+        }
+    }
 
     public LocalDateTime getDateCreation() { return dateCreation; }
-    public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
-
     public LocalDateTime getDateModification() { return dateModification; }
-    public void setDateModification(LocalDateTime dateModification) { this.dateModification = dateModification; }
 
     @PrePersist
     protected void onCreate() {
         dateCreation = LocalDateTime.now();
+        if (dateFacture == null) {
+            dateFacture = dateCreation;
+        }
     }
 
     @PreUpdate
@@ -121,15 +136,46 @@ public class Facture {
         dateModification = LocalDateTime.now();
     }
 
-    // Méthodes utilitaires
+    // Calcul des montants à partir des lignes de facture
     public void calculerMontants() {
-        if (lignes != null) {
+        if (lignes != null && !lignes.isEmpty()) {
             montantHT = lignes.stream()
+                    .filter(ligne -> ligne.getQuantite() != null && ligne.getPrixUnitaire() != null)
                     .mapToDouble(ligne -> ligne.getQuantite() * ligne.getPrixUnitaire())
                     .sum();
             montantTVA = montantHT * (tauxTVA / 100);
             montantTTC = montantHT + montantTVA;
+        } else {
+            montantHT = 0.0;
+            montantTVA = 0.0;
+            montantTTC = 0.0;
         }
     }
-}
 
+    @Override
+    public String toString() {
+        return "Facture{" +
+                "id=" + id +
+                ", numeroFacture='" + numeroFacture + '\'' +
+                ", clientId=" + clientId +
+                ", dateFacture=" + dateFacture +
+                ", montantHT=" + montantHT +
+                ", montantTVA=" + montantTVA +
+                ", montantTTC=" + montantTTC +
+                ", statut=" + statut +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Facture)) return false;
+        Facture facture = (Facture) o;
+        return Objects.equals(id, facture.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+}
