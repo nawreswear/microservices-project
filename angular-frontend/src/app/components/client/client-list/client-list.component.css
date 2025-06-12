@@ -550,11 +550,11 @@ button[mat-icon-button] mat-icon {
   }
   
   button[mat-icon-button][color="primary"] {
-    background: #0000ff !important;
+    background: #050596 !important;
   }
   
   button[mat-icon-button][color="warn"] {
-    background: #ff0000 !important;
+    background: #a80808 !important;
   }
 }
 

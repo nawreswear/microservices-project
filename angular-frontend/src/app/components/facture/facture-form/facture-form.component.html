@@ -200,7 +200,7 @@
                                   min="0"
                                   [class.is-invalid]="submitted && ligne.get('prixUnitaire') && ligne.get('prixUnitaire')!.errors">
                                 <div class="input-group-append">
-                                  <span class="input-group-text">€</span>
+                                  <span class="input-group-text"> </span>
                                 </div>
                               </div>
                               <div *ngIf="submitted && ligne.get('prixUnitaire') && ligne.get('prixUnitaire')!.errors" class="invalid-feedback">
@@ -216,7 +216,7 @@
                                   formControlName="montantLigne"
                                   readonly>
                                 <div class="input-group-append">
-                                  <span class="input-group-text">€</span>
+                                  <span class="input-group-text">DT </span>
                                 </div>
                               </div>
                             </td>

@@ -7,7 +7,7 @@ import { Reglement, ModePaiement, StatutReglement } from '../models/reglement.mo
   providedIn: 'root'
 })
 export class ReglementService {
-  private apiUrl = 'http://localhost:8087/api/reglements';
+  private apiUrl = 'http://localhost:8007/api/reglements';
 
   constructor(private http: HttpClient) { }
 

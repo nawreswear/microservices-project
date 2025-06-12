@@ -14,15 +14,13 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./client-list.component.css']
 })
 export class ClientListComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['id', 'nom', 'prenom', 'email', 'telephone', 'actions'];//, 'chiffreAffaires', 'resteAPayer'
+  displayedColumns: string[] = ['id', 'nom', 'prenom', 'email', 'telephone', 'actions'];
   dataSource = new MatTableDataSource<Client>();
   loading = false;
   loyalClients: Client[] = [];
   searchNom: string = '';
   searchPrenom: string = '';
   selectedClientId: number | null = null;
-  //chiffreAffaires: number | null = null;
- // chiffreAffairesParAnnee: number | null = null;
   resteAPayer: number | null = null;
   selectedYear: number = new Date().getFullYear();
 
@@ -42,8 +40,11 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // Ensures paginator and sort are initialized after the view is fully loaded
+    setTimeout(() => {
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    });
   }
 
   loadClients(): void {
@@ -89,26 +90,6 @@ export class ClientListComponent implements OnInit, AfterViewInit {
     }
   }
 
- /* getClientRevenue(clientId: number): void {
-    this.selectedClientId = clientId;
-    this.clientService.getChiffreAffaires(clientId).subscribe({
-      next: revenue => this.chiffreAffaires = revenue,
-      error: () => {
-        this.snackBar.open('Error fetching client revenue', 'Close', { duration: 5000 });
-      }
-    });
-  }
-
-  getClientRevenueByYear(clientId: number, year: number): void {
-    this.selectedClientId = clientId;
-    this.clientService.getChiffreAffairesParAnnee(clientId, year).subscribe({
-      next: revenue => this.chiffreAffairesParAnnee = revenue,
-      error: () => {
-        this.snackBar.open('Error fetching client revenue by year', 'Close', { duration: 5000 });
-      }
-    });
-  }*/
-
   getClientOutstandingBalance(clientId: number): void {
     this.selectedClientId = clientId;
     this.clientService.getResteAPayer(clientId).subscribe({
@@ -122,7 +103,6 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
@@ -173,8 +153,6 @@ export class ClientListComponent implements OnInit, AfterViewInit {
     this.searchNom = '';
     this.searchPrenom = '';
     this.selectedClientId = null;
-   // this.chiffreAffaires = null;
-   // this.chiffreAffairesParAnnee = null;
     this.resteAPayer = null;
   }
 
@@ -185,7 +163,6 @@ export class ClientListComponent implements OnInit, AfterViewInit {
       Prénom: client.prenom,
       Email: client.email,
       Téléphone: client.telephone || '-',
-     // 'Chiffre d\'affaires': this.chiffreAffaires !== null ? this.chiffreAffaires : '-',
       'Reste à payer': this.resteAPayer !== null ? this.resteAPayer : '-'
     }));
 
@@ -202,10 +179,23 @@ export class ClientListComponent implements OnInit, AfterViewInit {
   }
 
   canEdit(): boolean {
-    return this.authService.isAdmin();
+   // return this.authService.isAdmin();
+   return true;
   }
 
   canDelete(): boolean {
-    return this.authService.isAdmin();
+    //return this.authService.isAdmin();
+    return true;
   }
+
+  // Optional: you can restore revenue-related methods if you plan to use them
+  /*
+  getClientRevenue(clientId: number): void {
+    ...
+  }
+
+  getClientRevenueByYear(clientId: number, year: number): void {
+    ...
+  }
+  */
 }

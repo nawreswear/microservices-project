@@ -14,9 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/reglements")
-@CrossOrigin(origins = "http://localhost:4200",
-        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
-        allowedHeaders = "*")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ReglementController {
 
     @Autowired

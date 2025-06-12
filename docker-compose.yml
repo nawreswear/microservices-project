@@ -154,7 +154,7 @@ services:
     build: ./reglement-service
     container_name: reglement-service
     ports:
-      - "8282:8282"
+      - "8007:8007"
     depends_on:
       - salesapp-mysql
       - eureka-discovery

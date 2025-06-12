@@ -1,5 +1,8 @@
 package com.salesapp.facture.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,7 +19,7 @@ public class Facture {
 
     @Column(name = "numero_facture", unique = true, nullable = false)
     private String numeroFacture;
-
+    @JsonIgnore
     @Column(name = "client_id", nullable = false)
     private Long clientId;
 
@@ -48,6 +51,7 @@ public class Facture {
     private String observations;
 
     @OneToMany(mappedBy = "facture", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<LigneFacture> lignes = new ArrayList<>();
 
     @Column(name = "date_creation", nullable = false, updatable = false)

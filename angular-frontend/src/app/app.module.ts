@@ -58,6 +58,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { APP_BASE_HREF } from '@angular/common';
 import { ReglementListComponent } from './components/reglement/reglement-list/reglement-list.component';
 import { DeviseListComponent } from './components/devise/devise-list/devise-list.component';
+import { MatDividerModule, MatMenuModule } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -95,6 +96,11 @@ import { DeviseListComponent } from './components/devise/devise-list/devise-list
     MatCardModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    MatMenuModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    MatDividerModule,
   ],
   providers: [
     AuthService,

@@ -280,9 +280,9 @@
                 <td>
                   {{ facture.dateEcheance ? (facture.dateEcheance | date: 'shortDate') : '-' }}
                 </td>
-                <td>{{ facture.montantHT | currency:'EUR':'symbol':'1.2-2' }}</td>
+                <td>{{ facture.montantHT  }}DT</td>
                 <td>
-                  <strong>{{ facture.montantTTC | currency:'EUR':'symbol':'1.2-2' }}</strong>
+                  <strong>{{ facture.montantTTC }}DT</strong>
                 </td>
                 <td>
                   <span class="badge" 

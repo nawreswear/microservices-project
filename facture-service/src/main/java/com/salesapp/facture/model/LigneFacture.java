@@ -1,5 +1,7 @@
 package com.salesapp.facture.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -12,6 +14,7 @@ public class LigneFacture {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "facture_id", nullable = false)
+    @JsonBackReference
     private Facture facture;
 
     @Column(name = "dispositif_id", nullable = false)

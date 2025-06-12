@@ -1,60 +1,63 @@
-// Enum correspondant exactement au backend Java
+// ✅ Manually define Omit for TypeScript < 3.5
+type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
+
+// Enum matching the Java backend exactly
 export enum StatutFacture {
   BROUILLON = 'BROUILLON',
-  VALIDE = 'VALIDE',      // Pas VALIDEE
-  ENVOYE = 'ENVOYE',      // Pas ENVOYEE
-  PAYE = 'PAYE',          // Pas PAYEE
-  ANNULE = 'ANNULE',      // Pas ANNULEE
+  VALIDE = 'VALIDE',      // Not VALIDEE
+  ENVOYE = 'ENVOYE',      // Not ENVOYEE
+  PAYE = 'PAYE',          // Not PAYEE
+  ANNULE = 'ANNULE',      // Not ANNULEE
   EN_RETARD = 'EN_RETARD'
 }
 
-// Interface pour LigneFacture correspondant au modèle Java
+// Interface for LigneFacture matching the Java model
 export interface LigneFacture {
   id?: number;
-  dispositifId: number;    // Long en Java
+  dispositifId: number;     // Long in Java
   nomDispositif: string;
-  quantite: number;        // Integer en Java
-  prixUnitaire: number;    // Double en Java
-  montantLigne: number;    // Double en Java - calculé automatiquement
+  quantite: number;         // Integer in Java
+  prixUnitaire: number;     // Double in Java
+  montantLigne: number;     // Double in Java - calculated automatically
   description?: string;
-  // Note: facture n'est pas incluse pour éviter les références circulaires
+  // Note: no facture reference to avoid circular dependency
 }
 
-// Interface pour Facture correspondant au modèle Java
+// Interface for Facture matching the Java model
 export interface Facture {
   id?: number;
   numeroFacture: string;
-  clientId: number;        // Long en Java
-  clientNom?: string;      // Champ supplémentaire pour l'affichage (pas dans le modèle Java)
-  
-  // Dates au format ISO string pour compatibilité avec LocalDateTime
-  dateFacture: string;     // LocalDateTime en Java
-  dateEcheance?: string;   // LocalDateTime en Java
-  dateCreation?: string;   // LocalDateTime en Java
-  dateModification?: string; // LocalDateTime en Java
-  
-  // Montants
-  montantHT: number;       // Double en Java, valeur par défaut 0.0
-  montantTVA: number;      // Double en Java, valeur par défaut 0.0
-  montantTTC: number;      // Double en Java, valeur par défaut 0.0
-  tauxTVA: number;         // Double en Java, valeur par défaut 20.0
-  
-  // Statut utilisant l'enum
+  clientId: number;         // Long in Java
+  clientNom?: string;       // Additional display field (not in Java model)
+
+  // Dates as ISO strings to match Java's LocalDateTime
+  dateFacture: string;      // LocalDateTime in Java
+  dateEcheance?: string;
+  dateCreation?: string;
+  dateModification?: string;
+
+  // Amounts
+  montantHT: number;        // Double in Java, default 0.0
+  montantTVA: number;       // Double in Java, default 0.0
+  montantTTC: number;       // Double in Java, default 0.0
+  tauxTVA: number;          // Double in Java, default 20.0
+
+  // Enum status
   statut: StatutFacture;
-  
-  // Champs optionnels
+
+  // Optional fields
   modePaiement?: string;
   observations?: string;
-  
+
   // Relations
-  lignes: LigneFacture[];  // List<LigneFacture> en Java
+  lignes: LigneFacture[];   // List<LigneFacture> in Java
 }
 
-// Types utilitaires pour les requêtes
+// Utility types for API requests
 export type CreateFactureRequest = Omit<Facture, 'id' | 'dateCreation' | 'dateModification'>;
 export type UpdateFactureRequest = Partial<Omit<Facture, 'id' | 'dateCreation'>>;
 
-// Interface pour les réponses avec pagination (si nécessaire plus tard)
+// Interface for paginated response (for future use)
 export interface FacturePageResponse {
   content: Facture[];
   totalElements: number;
