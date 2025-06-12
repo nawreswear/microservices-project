@@ -46,7 +46,7 @@ export class DashboardComponent implements OnInit {
       this.stats.totalFactures = factures.length;
       this.recentFactures = factures.slice(0, 5);
       this.stats.chiffreAffaires = factures
-        .filter(f => f.statut === 'PAYEE')
+        .filter(f => f.statut === 'PAYE')
         .reduce((sum, f) => sum + f.montantTTC, 0);
     });
 

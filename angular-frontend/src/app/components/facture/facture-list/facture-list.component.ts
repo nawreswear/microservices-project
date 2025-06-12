@@ -1,8 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Facture } from 'src/app/models/facture.model';
+import { Facture, StatutFacture } from 'src/app/models/facture.model';
 import { AuthService } from 'src/app/services/auth.service';
 import { FactureService } from 'src/app/services/facture.service';
 import { ClientService } from 'src/app/services/client.service';
+
+interface Client {
+  id: number;
+  nom: string;
+}
 
 @Component({
   selector: 'app-facture-list',
@@ -22,7 +27,8 @@ export class FactureListComponent implements OnInit {
   showForm: boolean = false;
 
   // Dropdown data
-  clientNames: string[] = [];
+  clients: Client[] = [];
+  statutOptions = Object.values(StatutFacture);
 
   constructor(
     public authService: AuthService,
@@ -32,42 +38,38 @@ export class FactureListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFactures();
-    this.loadClientNames();
+    //this.loadClients();
   }
 
-  /** Fetches all client names for the dropdown */
-  loadClientNames(): void {
+  /** Fetches all clients for the dropdown 
+  loadClients(): void {
     this.clientService.getClients().subscribe({
       next: (clients) => {
-        this.clientNames = clients.map(client => client.nom);
+        this.clientService = clients;
       },
       error: (err) => {
-        console.error('Failed to load client names', err);
-        this.clientNames = [];
+        console.error('Failed to load clients', err);
+        this.clients = [];
       }
     });
-  }
+  }*/
 
   /** Creates a new empty facture object */
   getEmptyFacture(): Facture {
     const now = new Date().toISOString();
     return {
-      id: undefined,
       numeroFacture: '',
       clientId: 0,
-      clientNom: '',
       dateFacture: now,
       dateEcheance: undefined,
       montantHT: 0,
       montantTVA: 0,
       montantTTC: 0,
       tauxTVA: 20,
-      statut: 'BROUILLON',
+      statut: StatutFacture.BROUILLON,
       lignes: [],
       modePaiement: '',
-      observations: '',
-      dateCreation: undefined,
-      dateModification: undefined
+      observations: ''
     };
   }
 
@@ -76,8 +78,12 @@ export class FactureListComponent implements OnInit {
     this.loading = true;
     this.factureService.getFactures().subscribe({
       next: (data) => {
-        this.factures = data;
-        this.filteredFactures = data;
+        // Enrichir les factures avec les noms des clients
+        this.factures = data.map(facture => ({
+          ...facture,
+          clientNom: this.getClientName(facture.clientId)
+        }));
+        this.filteredFactures = this.factures;
         this.loading = false;
       },
       error: (err) => {
@@ -86,6 +92,12 @@ export class FactureListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  /** Get client name by ID */
+  getClientName(clientId: number): string {
+    const client = this.clients.find(c => c.id === clientId);
+    return client ? client.nom : 'Client inconnu';
   }
 
   /** Filter factures by search term */
@@ -97,31 +109,27 @@ export class FactureListComponent implements OnInit {
     ) : this.factures;
   }
 
-  /** Handles create or update form submission */
-  onSubmit(): void {
-    const now = new Date().toISOString();
-
-    // Calculate montantTVA and montantTTC based on montantHT and tauxTVA
+  /** Calculate TVA and TTC when HT or TVA rate changes */
+  calculateMontants(): void {
     const montantHT = this.newFacture.montantHT || 0;
     const tauxTVA = this.newFacture.tauxTVA || 20;
-    const montantTVA = montantHT * (tauxTVA / 100);
-    const montantTTC = montantHT + montantTVA;
+    
+    this.newFacture.montantTVA = montantHT * (tauxTVA / 100);
+    this.newFacture.montantTTC = montantHT + this.newFacture.montantTVA;
+  }
 
+  /** Handles create or update form submission */
+  onSubmit(): void {
+    // Ensure calculations are up to date
+    this.calculateMontants();
+
+    // Prepare payload
     const payload: Facture = {
       ...this.newFacture,
-      dateFacture: this.formatToDateTime(this.newFacture.dateFacture || now),
-      dateEcheance: this.newFacture.dateEcheance
-        ? this.formatToDateTime(this.newFacture.dateEcheance)
-        : undefined,
-      dateCreation: this.newFacture.dateCreation || now,
-      dateModification: now,
-      montantHT: montantHT,
-      montantTVA: montantTVA,
-      montantTTC: montantTTC,
-      modePaiement: this.newFacture.modePaiement || 'Inconnu',
-      observations: this.newFacture.observations || '',
-      tauxTVA: tauxTVA,
-      statut: this.newFacture.statut || 'BROUILLON'
+      dateFacture: this.formatToBackendDateTime(this.newFacture.dateFacture),
+      dateEcheance: this.newFacture.dateEcheance 
+        ? this.formatToBackendDateTime(this.newFacture.dateEcheance)
+        : undefined
     };
 
     if (this.editing) {
@@ -154,15 +162,32 @@ export class FactureListComponent implements OnInit {
     }
   }
 
-  /** Converts a date to ISO string */
-  formatToDateTime(dateInput: any): string {
-    const date = new Date(dateInput);
+  /** Converts date from form to backend format (ISO string) */
+  formatToBackendDateTime(dateInput: string): string {
+    // If it's already an ISO string, return as is
+    if (dateInput.includes('T')) {
+      return dateInput;
+    }
+    
+    // If it's a date string from HTML date input (YYYY-MM-DD)
+    const date = new Date(dateInput + 'T00:00:00');
     return date.toISOString();
+  }
+
+  /** Converts backend date to form format (YYYY-MM-DD) */
+  formatToFormDate(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
   }
 
   /** Enables edit mode for selected facture */
   onEdit(facture: Facture): void {
-    this.newFacture = { ...facture };
+    this.newFacture = {
+      ...facture,
+      dateFacture: this.formatToFormDate(facture.dateFacture),
+      dateEcheance: facture.dateEcheance ? this.formatToFormDate(facture.dateEcheance) : undefined
+    };
     this.showForm = true;
     this.editing = true;
   }
@@ -170,6 +195,8 @@ export class FactureListComponent implements OnInit {
   /** Starts creating a new facture */
   startCreate(): void {
     this.newFacture = this.getEmptyFacture();
+    // Format date for form input
+    this.newFacture.dateFacture = this.formatToFormDate(this.newFacture.dateFacture);
     this.showForm = true;
     this.editing = false;
   }
@@ -188,11 +215,63 @@ export class FactureListComponent implements OnInit {
     }
   }
 
+  /** Validates a facture */
+  onValidate(id: number): void {
+    this.factureService.validerFacture(id).subscribe({
+      next: () => {
+        this.loadFactures();
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to validate invoice.';
+        console.error(err);
+      }
+    });
+  }
+
+  /** Marks a facture as paid */
+  onMarkAsPaid(id: number): void {
+    this.factureService.marquerCommePaye(id).subscribe({
+      next: () => {
+        this.loadFactures();
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to mark invoice as paid.';
+        console.error(err);
+      }
+    });
+  }
+
+  /** Get overdue invoices */
+  loadOverdueInvoices(): void {
+    this.factureService.getFacturesEnRetard().subscribe({
+      next: (data) => {
+        this.factures = data.map(facture => ({
+          ...facture,
+          clientNom: this.getClientName(facture.clientId)
+        }));
+        this.filteredFactures = this.factures;
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load overdue invoices.';
+        console.error(err);
+      }
+    });
+  }
+
   /** Resets the form and hides it */
   resetForm(): void {
     this.newFacture = this.getEmptyFacture();
     this.editing = false;
     this.showForm = false;
     this.errorMessage = '';
+  }
+
+  /** Handle client selection change */
+  onClientChange(): void {
+    // Update clientNom when clientId changes
+    const selectedClient = this.clients.find(c => c.id === this.newFacture.clientId);
+    if (selectedClient) {
+      this.newFacture.clientNom = selectedClient.nom;
+    }
   }
 }
