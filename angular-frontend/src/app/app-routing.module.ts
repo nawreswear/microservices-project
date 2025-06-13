@@ -12,6 +12,7 @@ import { FactureListComponent } from './components/facture/facture-list/facture-
 import { FactureFormComponent } from './components/facture/facture-form/facture-form.component';
 import { ReglementListComponent } from './components/reglement/reglement-list/reglement-list.component';
 import { DeviseListComponent } from './components/devise/devise-list/devise-list.component';
+import { UserProfileComponent } from './components/user-profile/user-profile.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -31,6 +32,7 @@ const routes: Routes = [
   { path: 'factures/edit/:id', component: FactureFormComponent },
    { path: 'reglements', component: ReglementListComponent },
    { path: 'devises', component: DeviseListComponent },
+   { path: 'userProfileComponent', component: UserProfileComponent },
   { path: '**', redirectTo: '/dashboard' }
 ];
 

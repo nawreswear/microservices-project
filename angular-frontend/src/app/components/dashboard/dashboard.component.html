@@ -10,7 +10,7 @@
             </div>
             <div>
               <h1 class="welcome-title">Tableau de Bord</h1>
-              <p class="welcome-subtitle">Bienvenue {{ authService.getCurrentUser()?.username }}, voici un aperçu de votre activité</p>
+              <p class="welcome-subtitle">Bienvenue {{ currentUser?.username }}, voici un aperçu de votre activité</p>
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@
             <div class="stat-card-body">
               <div class="stat-content">
                 <div class="stat-info">
-                  <h3 class="stat-number">{{ stats.chiffreAffaires | currency:'EUR':'symbol':'1.0-0' }}</h3>
+                  <h3 class="stat-number">{{ stats.chiffreAffaires }} DT</h3>
                   <p class="stat-label">Chiffre d'Affaires</p>
                   <div class="stat-trend">
                     <i class="fas fa-arrow-up"></i>
@@ -181,7 +181,7 @@
                     <span class="date-text">{{ facture.dateFacture | date:'short' }}</span>
                   </div>
                   <div class="table-cell">
-                    <span class="amount-text">{{ facture.montantTTC | currency:'EUR':'symbol':'1.2-2' }}</span>
+                    <span class="amount-text">{{ facture.montantTTC }}  DT</span>
                   </div>
                   <div class="table-cell">
                     <span class="status-badge" [ngClass]="{

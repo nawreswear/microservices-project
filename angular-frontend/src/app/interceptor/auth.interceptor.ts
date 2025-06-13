@@ -1,35 +1,38 @@
 import { Injectable } from '@angular/core';
 import {
+  HttpEvent,
+  HttpHandler,
   HttpInterceptor,
   HttpRequest,
-  HttpHandler,
-  HttpEvent
+  HttpErrorResponse,
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { AuthService } from '../services/auth.service';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-
-  constructor(private authService: AuthService) {}
-
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = this.authService.getToken();
+  intercept(
+    request: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
+    const token = localStorage.getItem('token');
 
     if (token) {
-      const authReq = req.clone({
-        headers: req.headers.set('Authorization', `Bearer ${token}`)
+      request = request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      return next.handle(authReq);
     }
 
-    return next.handle(req);
+    return next.handle(request).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // Optionnel : gestion centralisée des erreurs
+        if (error.status === 401 || error.status === 403) {
+          console.warn('Non autorisé ou accès interdit');
+        }
+        return throwError(() => error);
+      })
+    );
   }
 }
-//#Gets the token from AuthService
-
-//Clones the original HTTP request
-
-//Adds the Authorization: Bearer <token> header
-
-//Sends the modified request

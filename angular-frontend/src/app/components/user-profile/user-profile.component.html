@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile & Settings Components</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+   
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Component Navigation -->
+        <div class="component-nav">
+            <div class="nav-buttons">
+                <a href="#" class="nav-btn active" onclick="showComponent('profile')">
+                    <i class="fas fa-user"></i> My Profile
+                </a>
+                <a href="#" class="nav-btn" onclick="showComponent('settings')">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </div>
+        </div>
+
+        <!-- My Profile Component -->
+        <div id="profile-component" class="component-card active">
+            <div class="component-header">
+                <h2><i class="fas fa-user-circle"></i> My Profile</h2>
+                <p>Manage your personal information and profile details</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h4>John Smith</h4>
+                        <p class="text-muted">Senior Developer</p>
+                        <button class="upload-btn">
+                            <i class="fas fa-camera"></i> Change Photo
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="profile-info">
+                        <form id="profileForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" class="form-control" value="John" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" value="Smith" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-control" value="john.smith@company.com" required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" value="+1 (555) 123-4567">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Job Title</label>
+                                    <input type="text" class="form-control" value="Senior Developer">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Company</label>
+                                <input type="text" class="form-control" value="Tech Solutions Inc.">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Location</label>
+                                <input type="text" class="form-control" value="San Francisco, CA">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Bio</label>
+                                <textarea class="form-control" rows="4" placeholder="Tell us about yourself...">Passionate software developer with 8+ years of experience in full-stack development. Love creating innovative solutions and mentoring junior developers.</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Website</label>
+                                <input type="url" class="form-control" placeholder="https://yourwebsite.com">
+                            </div>
+
+                            <div class="action-buttons">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo"></i> Reset
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Component -->
+        <div id="settings-component" class="component-card">
+            <div class="component-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <p>Configure your account preferences and privacy settings</p>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="settings-section">
+                <h4><i class="fas fa-user-cog"></i> Account Settings</h4>
+                
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Username</div>
+                        <div class="setting-description">Your unique identifier</div>
+                    </div>
+                    <input type="text" class="form-control" style="max-width: 200px;" value="johnsmith2024">
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Language</div>
+                        <div class="setting-description">Choose your preferred language</div>
+                    </div>
+                    <select class="form-select" style="max-width: 150px;">
+                        <option selected>English</option>
+                        <option>Spanish</option>
+                        <option>French</option>
+                        <option>German</option>
+                        <option>Italian</option>
+                    </select>
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Time Zone</div>
+                        <div class="setting-description">Set your local time zone</div>
+                    </div>
+                    <select class="form-select" style="max-width: 200px;">
+                        <option>Pacific Time (PT)</option>
+                        <option selected>Eastern Time (ET)</option>
+                        <option>Central Time (CT)</option>
+                        <option>Mountain Time (MT)</option>
+                        <option>UTC</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Privacy Settings -->
+            <div class="settings-section">
+                <h4><i class="fas fa-shield-alt"></i> Privacy Settings</h4>
+                
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Profile Visibility</div>
+                        <div class="setting-description">Make your profile visible to other users</div>
+                    </div>
+                    <input class="form-check-input" type="checkbox" checked>
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Show Email</div>
+                        <div class="setting-description">Display your email address on your profile</div>
+                    </div>
+                    <input class="form-check-input" type="checkbox">
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Allow Messages</div>
+                        <div class="setting-description">Let other users send you messages</div>
+                    </div>
+                    <input class="form-check-input" type="checkbox" checked>
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Show Online Status</div>
+                        <div class="setting-description">Display when you're online</div>
+                    </div>
+                    <input class="form-check-input" type="checkbox" checked>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="settings-section">
+                <h4><i class="fas fa-bell"></i> Notification Settings</h4>
+                
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Email Notifications</div>
+                        <div class="setting-description">Receive notifications via email</div>
+                    </div>
+                    <input class="form-check-input" type="checkbox" checked>
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Push Notifications</div>
+                        <div class="setting-description">Get browser push notifications</div>
+                    </div>
+                    <input class="form-check-input" type="checkbox" checked>
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">SMS Notifications</div>
+                        <div class="setting-description">Receive important updates via SMS</div>
+                    </div>
+                    <input class="form-check-input" type="checkbox">
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Marketing Emails</div>
+                        <div class="setting-description">Receive promotional content and updates</div>
+                    </div>
+                    <input class="form-check-input" type="checkbox">
+                </div>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="settings-section">
+                <h4><i class="fas fa-lock"></i> Security Settings</h4>
+                
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Two-Factor Authentication</div>
+                        <div class="setting-description">Add an extra layer of security to your account</div>
+                    </div>
+                    <input class="form-check-input" type="checkbox" checked>
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Login Alerts</div>
+                        <div class="setting-description">Get notified of new login attempts</div>
+                    </div>
+                    <input class="form-check-input" type="checkbox" checked>
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Session Timeout</div>
+                        <div class="setting-description">Automatically log out after inactivity</div>
+                    </div>
+                    <select class="form-select" style="max-width: 150px;">
+                        <option>30 minutes</option>
+                        <option selected>1 hour</option>
+                        <option>2 hours</option>
+                        <option>Never</option>
+                    </select>
+                </div>
+
+                <div class="settings-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Password</div>
+                        <div class="setting-description">Change your account password</div>
+                    </div>
+                    <button class="btn btn-outline-secondary btn-sm">Change Password</button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button type="button" class="btn btn-primary" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> Save All Settings
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="resetSettings()">
+                    <i class="fas fa-undo"></i> Reset to Default
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Component switching functionality
+        function showComponent(componentName) {
+            // Update navigation buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.nav-btn').classList.add('active');
+
+            // Hide all components
+            document.querySelectorAll('.component-card').forEach(card => {
+                card.classList.remove('active');
+            });
+
+            // Show selected component
+            document.getElementById(componentName + '-component').classList.add('active');
+        }
+
+        // Profile form submission
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show success message
+            const button = this.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '<i class="fas fa-check"></i> Saved!';
+            button.style.background = 'linear-gradient(45deg, #48bb78, #38a169)';
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
+            }, 2000);
+        });
+
+        // Photo upload functionality
+        document.querySelector('.upload-btn').addEventListener('click', function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const avatar = document.querySelector('.profile-avatar');
+                        avatar.style.backgroundImage = `url(${e.target.result})`;
+                        avatar.style.backgroundSize = 'cover';
+                        avatar.style.backgroundPosition = 'center';
+                        avatar.innerHTML = '';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        });
+
+        // Settings functionality
+        function saveSettings() {
+            const button = event.target;
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.innerHTML = '<i class="fas fa-check"></i> Settings Saved!';
+                button.style.background = 'linear-gradient(45deg, #48bb78, #38a169)';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
+                    button.disabled = false;
+                }, 2000);
+            }, 1500);
+        }
+
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset all settings to their default values?')) {
+                // Reset all checkboxes to default state
+                const checkboxes = document.querySelectorAll('#settings-component .form-check-input');
+                checkboxes.forEach((checkbox, index) => {
+                    // Set default values (customize as needed)
+                    const defaultStates = [true, false, true, true, true, true, false, false, true, true];
+                    checkbox.checked = defaultStates[index] || false;
+                });
+
+                // Reset select elements
+                document.querySelectorAll('#settings-component .form-select').forEach(select => {
+                    select.selectedIndex = 0;
+                });
+
+                alert('Settings have been reset to default values.');
+            }
+        }
+
+        // Change password functionality
+        document.querySelector('.settings-section button').addEventListener('click', function() {
+            const currentPassword = prompt('Enter your current password:');
+            if (currentPassword) {
+                const newPassword = prompt('Enter your new password:');
+                if (newPassword) {
+                    const confirmPassword = prompt('Confirm your new password:');
+                    if (newPassword === confirmPassword) {
+                        alert('Password changed successfully!');
+                    } else {
+                        alert('Passwords do not match. Please try again.');
+                    }
+                }
+            }
+        });
+
+        // Initialize tooltips (if needed)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add any initialization code here
+            console.log('Profile and Settings components initialized');
+        });
+    </script>
+</body>
+</html>

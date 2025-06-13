@@ -45,12 +45,6 @@ import { AuthService } from './services/auth.service';
 import { ClientService } from './services/client.service';
 import { ProduitService } from './services/produit.service';
 import { FactureService } from './services/facture.service';
-
-
-// Guards
-import { AuthGuard } from './guards/auth.guards';
-import { AdminGuard } from './guards/admin.guards';
-
 // Interceptors
 import { AuthInterceptor } from './interceptor/auth.interceptor';
 import { DispositifService } from './services/dispositif.service';
@@ -59,6 +53,7 @@ import { APP_BASE_HREF } from '@angular/common';
 import { ReglementListComponent } from './components/reglement/reglement-list/reglement-list.component';
 import { DeviseListComponent } from './components/devise/devise-list/devise-list.component';
 import { MatDividerModule, MatMenuModule } from '@angular/material';
+import { UserProfileComponent } from './components/user-profile/user-profile.component';
 
 @NgModule({
   declarations: [
@@ -77,6 +72,7 @@ import { MatDividerModule, MatMenuModule } from '@angular/material';
     SidebarComponent,
     ReglementListComponent,
     DeviseListComponent,
+    UserProfileComponent,
   ],
   imports: [
     BrowserModule,
@@ -108,8 +104,8 @@ import { MatDividerModule, MatMenuModule } from '@angular/material';
     ProduitService,
     FactureService,
     DispositifService,
-    AuthGuard,
-    AdminGuard,
+    //AuthGuard,
+   // AdminGuard,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

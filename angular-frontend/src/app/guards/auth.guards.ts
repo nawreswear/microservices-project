@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+/*import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
@@ -20,4 +20,4 @@ export class AuthGuard implements CanActivate {
       return false;
     }
   }
-}
+}*/

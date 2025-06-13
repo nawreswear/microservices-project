@@ -1,69 +1,198 @@
+/*import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { LoginRequest, JwtResponse, User } from '../models/auth.model';
+import { Observable } from 'rxjs';
+
+export interface AppUser {
+  id?: number;
+  username: string;
+  password: string;
+  roles?: { id?: number; roleName: string }[];
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8085/api/auth';
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private apiUrl = 'http://localhost:8085/users';
 
-  constructor(private http: HttpClient) {
-    this.loadCurrentUser();
+  constructor(private http: HttpClient) {}
+
+  
+  login(credentials: { username: string; password: string }): Observable<{ 'access-token': string, 'refresh-token': string }> {
+    return this.http.post<{ 'access-token': string, 'refresh-token': string }>(
+      `${this.apiUrl}/login`,
+      credentials
+    );
   }
 
-  login(loginRequest: LoginRequest): Observable<JwtResponse> {
-    return this.http.post<JwtResponse>(`${this.apiUrl}/login`, loginRequest)
-      .pipe(
-        tap(response => {
-          localStorage.setItem('token', response.token);
-          const user: User = {
-            username: response.username,
-            email: response.email,
-            roles: response.roles
-          };
-          localStorage.setItem('user', JSON.stringify(user));
-          this.currentUserSubject.next(user);
-        })
-      );
+ 
+  getAllUsers(): Observable<AppUser[]> {
+    return this.http.get<AppUser[]>(this.apiUrl, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+ 
+  addUser(user: AppUser): Observable<AppUser> {
+    return this.http.post<AppUser>(this.apiUrl, user, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+ 
+  registerUser(user: AppUser): Observable<AppUser> {
+    return this.http.post<AppUser>(`${this.apiUrl}/register`, user);
+  }
+
+  registerAdmin(user: AppUser): Observable<AppUser> {
+    return this.http.post<AppUser>(`${this.apiUrl}/register-admin`, user, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+ 
+  refreshToken(): Observable<{ 'access-token': string, 'refresh-token': string }> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.getRefreshToken()}`,
+    });
+
+    return this.http.get<{ 'access-token': string, 'refresh-token': string }>(
+      `${this.apiUrl}/refreshToken`,
+      { headers }
+    );
+  }
+
+
+  saveTokens(accessToken: string, refreshToken: string): void {
+    localStorage.setItem('access-token', accessToken);
+    localStorage.setItem('refresh-token', refreshToken);
+  }
+
+  getAccessToken(): string | null {
+    return localStorage.getItem('access-token');
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refresh-token');
+  }
+
+ 
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.getAccessToken();
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+
+  logout(): void {
+    localStorage.removeItem('access-token');
+    localStorage.removeItem('refresh-token');
+  }
+
+ 
+  isAuthenticated(): boolean {
+    return !!this.getAccessToken();
+  }
+}*/
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+
+export interface AppUser {
+  id?: number;
+  username: string;
+  password?: string;
+  roles?: { id?: number; roleName: string }[];
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthService {
+  private apiUrl = 'http://localhost:8085/users';
+
+  constructor(private http: HttpClient) {}
+
+  login(credentials: { username: string; password: string }): Observable<{ 'access-token': string; 'refresh-token': string }> {
+    return this.http.post<{ 'access-token': string; 'refresh-token': string }>(`${this.apiUrl}/login`, credentials);
+  }
+
+  getAllUsers(): Observable<AppUser[]> {
+    return this.http.get<AppUser[]>(this.apiUrl, { headers: this.getAuthHeaders() });
+  }
+
+  addUser(user: AppUser): Observable<AppUser> {
+    return this.http.post<AppUser>(this.apiUrl, user, { headers: this.getAuthHeaders() });
+  }
+
+  registerUser(user: AppUser): Observable<AppUser> {
+    return this.http.post<AppUser>(`${this.apiUrl}/register`, user);
+  }
+
+  registerAdmin(user: AppUser): Observable<AppUser> {
+    return this.http.post<AppUser>(`${this.apiUrl}/register-admin`, user, { headers: this.getAuthHeaders() });
+  }
+
+  refreshToken(): Observable<{ 'access-token': string; 'refresh-token': string }> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.getRefreshToken()}`,
+    });
+    return this.http.get<{ 'access-token': string; 'refresh-token': string }>(`${this.apiUrl}/refreshToken`, { headers });
+  }
+
+  saveTokens(accessToken: string, refreshToken: string): void {
+    localStorage.setItem('access-token', accessToken);
+    localStorage.setItem('refresh-token', refreshToken);
+  }
+
+  getAccessToken(): string | null {
+    return localStorage.getItem('access-token');
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refresh-token');
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.getAccessToken();
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.currentUserSubject.next(null);
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem('token');
+    localStorage.removeItem('access-token');
+    localStorage.removeItem('refresh-token');
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    return !!this.getAccessToken();
   }
 
-  getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
-  }
-
-  hasRole(role: string): boolean {
-    const user = this.getCurrentUser();
-    return user ? user.roles.includes(role) : false;
-  }
-
-  isAdmin(): boolean {
-    return this.hasRole('ADMIN');
-  }
-
-  private loadCurrentUser(): void {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      const user = JSON.parse(userStr);
-      this.currentUserSubject.next(user);
+  /**
+   * Méthode pour récupérer les infos de l’utilisateur connecté depuis le token.
+   * Ici, on suppose que le token JWT est décodé en JSON et contient le username.
+   * Sinon, à adapter selon backend.
+   */
+  getCurrentUser(): { username: string; roles?: string[] } | null {
+    const token = this.getAccessToken();
+    if (!token) {
+      return null;
+    }
+    try {
+      // Décoder le token (JWT) — partie payload entre les deux points
+      const payloadBase64 = token.split('.')[1];
+      const payloadJson = atob(payloadBase64);
+      const payload = JSON.parse(payloadJson);
+      return {
+        username: payload.sub || payload.username,
+        roles: payload.roles || [],
+      };
+    } catch (error) {
+      console.error('Erreur décodage token', error);
+      return null;
     }
   }
 }
+

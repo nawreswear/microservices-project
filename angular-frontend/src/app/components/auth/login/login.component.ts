@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
-import { LoginRequest } from '../../../models/auth.model';
+import { AuthService } from 'src/app/services/auth.service';
+
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
 
 @Component({
   selector: 'app-login',
@@ -22,15 +26,13 @@ export class LoginComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    // Rediriger si déjà connecté
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/dashboard']);
     }
 
-    // Charger les données sauvegardées si "Se souvenir de moi" était coché
     this.loadSavedCredentials();
   }
 
@@ -44,21 +46,28 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(this.loginRequest).subscribe({
       next: (response) => {
-        console.log('Connexion réussie:', response);
-        
-        // Sauvegarder les identifiants si "Se souvenir de moi" est coché
-        if (this.rememberMe) {
-          this.saveCredentials();
+        // 🔁 Use correct keys: 'access-token' and 'refresh-token'
+        const accessToken = response['access-token'];
+        const refreshToken = response['refresh-token'];
+
+        if (accessToken && refreshToken) {
+          this.authService.saveTokens(accessToken, refreshToken);
+
+          if (this.rememberMe) {
+            this.saveCredentials();
+          } else {
+            this.clearSavedCredentials();
+          }
+
+          this.router.navigate(['/dashboard']);
         } else {
-          this.clearSavedCredentials();
+          this.error = 'Invalid response from server';
         }
 
-        // Rediriger vers le dashboard
-        this.router.navigate(['/dashboard']);
         this.loading = false;
       },
       error: (err) => {
-        console.error('Erreur de connexion:', err);
+        console.error('Login error:', err);
         this.handleLoginError(err);
         this.loading = false;
       }
@@ -66,23 +75,23 @@ export class LoginComponent implements OnInit {
   }
 
   validateForm(): boolean {
-    if (!this.loginRequest.username || this.loginRequest.username.trim() === '') {
-      this.error = 'Le nom d\'utilisateur est obligatoire';
+    if (!this.loginRequest.username.trim()) {
+      this.error = 'Username is required';
       return false;
     }
 
-    if (!this.loginRequest.password || this.loginRequest.password.trim() === '') {
-      this.error = 'Le mot de passe est obligatoire';
+    if (!this.loginRequest.password.trim()) {
+      this.error = 'Password is required';
       return false;
     }
 
     if (this.loginRequest.username.length < 3) {
-      this.error = 'Le nom d\'utilisateur doit contenir au moins 3 caractères';
+      this.error = 'Username must be at least 3 characters';
       return false;
     }
 
     if (this.loginRequest.password.length < 6) {
-      this.error = 'Le mot de passe doit contenir au moins 6 caractères';
+      this.error = 'Password must be at least 6 characters';
       return false;
     }
 
@@ -91,15 +100,15 @@ export class LoginComponent implements OnInit {
 
   handleLoginError(error: any): void {
     if (error.status === 401) {
-      this.error = 'Nom d\'utilisateur ou mot de passe incorrect';
+      this.error = 'Incorrect username or password';
     } else if (error.status === 403) {
-      this.error = 'Accès refusé. Votre compte peut être désactivé.';
+      this.error = 'Access denied. Your account may be disabled.';
     } else if (error.status === 0) {
-      this.error = 'Impossible de se connecter au serveur. Vérifiez votre connexion.';
+      this.error = 'Cannot connect to server. Please check your internet.';
     } else if (error.error && error.error.message) {
       this.error = error.error.message;
     } else {
-      this.error = 'Une erreur inattendue s\'est produite. Veuillez réessayer.';
+      this.error = 'An unexpected error occurred. Please try again.';
     }
   }
 
@@ -112,16 +121,14 @@ export class LoginComponent implements OnInit {
   }
 
   saveCredentials(): void {
-    if (this.rememberMe) {
-      localStorage.setItem('savedUsername', this.loginRequest.username);
-      localStorage.setItem('rememberMe', 'true');
-    }
+    localStorage.setItem('savedUsername', this.loginRequest.username);
+    localStorage.setItem('rememberMe', 'true');
   }
 
   loadSavedCredentials(): void {
     const savedUsername = localStorage.getItem('savedUsername');
     const rememberMe = localStorage.getItem('rememberMe');
-    
+
     if (savedUsername && rememberMe === 'true') {
       this.loginRequest.username = savedUsername;
       this.rememberMe = true;
@@ -141,15 +148,9 @@ export class LoginComponent implements OnInit {
     this.clearError();
   }
 
-  // Méthode pour les utilisateurs de démonstration
   loginAsDemo(role: 'admin' | 'user'): void {
-    if (role === 'admin') {
-      this.loginRequest.username = 'admin';
-      this.loginRequest.password = 'admin123';
-    } else {
-      this.loginRequest.username = 'user';
-      this.loginRequest.password = 'user123';
-    }
+    this.loginRequest.username = role === 'admin' ? 'admin' : 'user';
+    this.loginRequest.password = role === 'admin' ? 'admin123' : 'user123';
     this.onSubmit();
   }
 }
