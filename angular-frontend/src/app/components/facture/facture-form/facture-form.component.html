@@ -1,127 +1,133 @@
-<div class="container-fluid">
+<div class="container-fluid invoice-container">
   <div class="row">
     <div class="col-12">
-      <div class="card shadow-lg border-0">
-        <div class="card-header bg-gradient-primary text-white">
+      <div class="card shadow-xl border-0 invoice-card">
+        <!-- Header -->
+        <div class="card-header invoice-header">
           <div class="d-flex justify-content-between align-items-center">
-            <h4 class="card-title mb-0">
-              <i class="fas fa-file-invoice mr-2"></i>
-              {{ isEditMode ? 'Modifier la facture' : 'Nouvelle facture' }}
-            </h4>
+            <div class="header-title">
+              <i class="fas fa-file-invoice-dollar header-icon"></i>
+              <h4 class="card-title mb-0">
+                {{ isEditMode ? 'Modifier la facture' : 'Nouvelle facture' }}
+              </h4>
+              <small class="header-subtitle">
+                {{ isEditMode ? 'Modification d\'une facture existante' : 'Création d\'une nouvelle facture' }}
+              </small>
+            </div>
             <div class="card-tools">
-              <button type="button" class="btn btn-tool text-white" (click)="onCancel()">
+              <button type="button" class="btn btn-header-tool" (click)="onCancel()">
                 <i class="fas fa-times"></i>
               </button>
             </div>
           </div>
         </div>
         
-        <div class="card-body p-4">
-          <form [formGroup]="factureForm" (ngSubmit)="onSubmit()">
-            <!-- En-tête de la facture -->
-            <div class="row mb-4">
-              <div class="col-12">
-                <div class="invoice-header bg-light p-3 rounded">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <h5 class="text-primary mb-3">
-                        <i class="fas fa-info-circle mr-2"></i>Informations générales
-                      </h5>
-                      
-                      <div class="form-group">
-                        <label for="numeroFacture" class="form-label font-weight-bold">
-                          <i class="fas fa-hashtag mr-1"></i>Numéro de facture
+        <div class="card-body invoice-body">
+          <form [formGroup]="factureForm" (ngSubmit)="onSubmit()" class="invoice-form">
+            
+            <!-- Invoice Header Information -->
+            <div class="form-section mb-5">
+              <div class="section-title">
+                <i class="fas fa-info-circle section-icon"></i>
+                <h5>Informations générales</h5>
+                <div class="section-line"></div>
+              </div>
+              
+              <div class="row g-4">
+                <div class="col-lg-6">
+                  <div class="info-card">
+                    <div class="info-card-header">
+                      <i class="fas fa-hashtag"></i>
+                      <span>Détails de la facture</span>
+                    </div>
+                    <div class="info-card-body">
+                      <div class="form-floating mb-3">
+                        <input type="text" 
+                               id="numero" 
+                               class="form-control" 
+                               formControlName="numero"
+                               placeholder="Numéro de facture"
+                               readonly>
+                        <label for="numero">
+                          <i class="fas fa-hashtag me-2"></i>Numéro de facture
                         </label>
-                        <input
-                          type="text"
-                          id="numeroFacture"
-                          class="form-control form-control-lg"
-                          formControlName="numeroFacture"
-                          placeholder="Auto-généré"
-                          readonly>
                       </div>
 
-                      <div class="form-group">
-                        <label for="clientId" class="form-label font-weight-bold">
-                          <i class="fas fa-user mr-1"></i>Client *
-                        </label>
-                        <select
-                          id="clientId"
-                          class="form-control form-control-lg"
-                          formControlName="clientId"
-                          [class.is-invalid]="submitted && f.clientId.errors">
+                      <div class="form-floating mb-3">
+                        <select id="clientId" 
+                                class="form-select" 
+                                formControlName="clientId"
+                                [class.is-invalid]="submitted && f['clientId'].errors">
                           <option value="">Sélectionner un client</option>
                           <option *ngFor="let client of clients" [value]="client.id">
                             {{ client.prenom }} {{ client.nom }} - {{ client.email }}
                           </option>
                         </select>
-                        <div *ngIf="submitted && f.clientId.errors" class="invalid-feedback">
-                          <div *ngIf="f.clientId.errors.required">Le client est requis</div>
+                        <label for="clientId">
+                          <i class="fas fa-user me-2"></i>Client *
+                        </label>
+                        <div *ngIf="submitted && f['clientId'].errors" class="invalid-feedback">
+                          <i class="fas fa-exclamation-triangle me-1"></i>
+                          Le client est requis
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
 
-                    <div class="col-md-6">
-                      <h5 class="text-primary mb-3">
-                        <i class="fas fa-calendar-alt mr-2"></i>Dates et conditions
-                      </h5>
-                      
-                      <div class="form-group">
-                        <label for="dateFacture" class="form-label font-weight-bold">
-                          <i class="fas fa-calendar mr-1"></i>Date de facture *
-                        </label>
-                        <input
-                          type="date"
-                          id="dateFacture"
-                          class="form-control form-control-lg"
-                          formControlName="dateFacture"
-                          [class.is-invalid]="submitted && f.dateFacture.errors">
-                        <div *ngIf="submitted && f.dateFacture.errors" class="invalid-feedback">
-                          <div *ngIf="f.dateFacture.errors.required">La date de facture est requise</div>
-                        </div>
-                      </div>
-
-                      <div class="form-group">
-                        <label for="dateEcheance" class="form-label font-weight-bold">
-                          <i class="fas fa-clock mr-1"></i>Date d'échéance
-                        </label>
-                        <input
-                          type="date"
-                          id="dateEcheance"
-                          class="form-control form-control-lg"
-                          formControlName="dateEcheance">
-                      </div>
-
-                      <div class="row">
+                <div class="col-lg-6">
+                  <div class="info-card">
+                    <div class="info-card-header">
+                      <i class="fas fa-calendar-alt"></i>
+                      <span>Dates et conditions</span>
+                    </div>
+                    <div class="info-card-body">
+                      <div class="row g-3">
                         <div class="col-md-6">
-                          <div class="form-group">
-                            <label for="tauxTVA" class="form-label font-weight-bold">
-                              <i class="fas fa-percentage mr-1"></i>Taux TVA (%)
+                          <div class="form-floating">
+                            <input type="date" 
+                                   id="dateEmission" 
+                                   class="form-control" 
+                                   formControlName="dateEmission"
+                                   [class.is-invalid]="submitted && f['dateEmission'].errors">
+                            <label for="dateEmission">
+                              <i class="fas fa-calendar me-2"></i>Date d'émission *
                             </label>
-                            <input
-                              type="number"
-                              id="tauxTVA"
-                              class="form-control form-control-lg"
-                              step="0.01"
-                              min="0"
-                              formControlName="tauxTVA"
-                              (change)="calculateTotals()">
+                            <div *ngIf="submitted && f['dateEmission'].errors" class="invalid-feedback">
+                              Date requise
+                            </div>
                           </div>
                         </div>
                         <div class="col-md-6">
-                          <div class="form-group">
-                            <label for="modePaiement" class="form-label font-weight-bold">
-                              <i class="fas fa-credit-card mr-1"></i>Mode de paiement
+                          <div class="form-floating">
+                            <input type="date" 
+                                   id="dateEcheance" 
+                                   class="form-control" 
+                                   formControlName="dateEcheance"
+                                   [class.is-invalid]="submitted && f['dateEcheance'].errors">
+                            <label for="dateEcheance">
+                              <i class="fas fa-clock me-2"></i>Date d'échéance *
                             </label>
-                            <select id="modePaiement" class="form-control form-control-lg" formControlName="modePaiement">
-                              <option value="">Sélectionner</option>
-                              <option value="ESPECES">Espèces</option>
-                              <option value="CHEQUE">Chèque</option>
-                              <option value="VIREMENT">Virement</option>
-                              <option value="CARTE_BANCAIRE">Carte bancaire</option>
-                              <option value="PRELEVEMENT">Prélèvement</option>
-                            </select>
+                            <div *ngIf="submitted && f['dateEcheance'].errors" class="invalid-feedback">
+                              Date requise
+                            </div>
                           </div>
+                        </div>
+                      </div>
+
+                      <div class="form-floating mt-3">
+                        <input type="number" 
+                               id="tauxTVA" 
+                               class="form-control" 
+                               step="0.01" 
+                               min="0" 
+                               formControlName="tauxTVA"
+                               [class.is-invalid]="submitted && f['tauxTVA'].errors">
+                        <label for="tauxTVA">
+                          <i class="fas fa-percentage me-2"></i>Taux TVA (%)
+                        </label>
+                        <div *ngIf="submitted && f['tauxTVA'].errors" class="invalid-feedback">
+                          Taux TVA requis
                         </div>
                       </div>
                     </div>
@@ -130,210 +136,205 @@
               </div>
             </div>
 
-            <!-- Lignes de facture -->
-            <div class="row mb-4">
-              <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                  <div class="card-header bg-gradient-info text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <h5 class="mb-0">
-                        <i class="fas fa-list mr-2"></i>Lignes de facture
-                      </h5>
-                      <button
-                        type="button"
-                        class="btn btn-light btn-sm"
+            <!-- Invoice Lines Section -->
+            <div class="form-section mb-5">
+              <div class="section-title">
+                <i class="fas fa-list section-icon"></i>
+                <h5>Lignes de facture</h5>
+                <div class="section-line"></div>
+                <button type="button" 
+                        class="btn btn-add-line" 
                         (click)="addLigne()">
-                        <i class="fas fa-plus mr-1"></i>Ajouter une ligne
-                      </button>
+                  <i class="fas fa-plus me-2"></i>Ajouter une ligne
+                </button>
+              </div>
+
+              <div class="lines-container">
+                <div class="table-responsive">
+                  <table class="table invoice-table">
+                    <thead>
+                      <tr>
+                        <th width="25%">
+                          <i class="fas fa-microchip me-2"></i>Dispositif
+                        </th>
+                        <th width="12%">
+                          <i class="fas fa-sort-numeric-up me-2"></i>Quantité
+                        </th>
+                        <th width="15%">
+                          <i class="fas fa-euro-sign me-2"></i>Prix unitaire
+                        </th>
+                        <th width="15%">
+                          <i class="fas fa-calculator me-2"></i>Montant
+                        </th>
+                        <th width="25%">
+                          <i class="fas fa-align-left me-2"></i>Description
+                        </th>
+                        <th width="8%">
+                          <i class="fas fa-cogs me-2"></i>Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody formArrayName="lignes">
+                      <tr *ngFor="let ligne of lignes.controls; let i = index" 
+                          [formGroupName]="i" 
+                          class="invoice-line">
+                        <td>
+                          <select class="form-select form-select-sm" 
+                                  formControlName="dispositifId"
+                                  [class.is-invalid]="submitted && ligne.get('dispositifId')?.errors">
+                            <option value="">Sélectionner un dispositif</option>
+                            <option *ngFor="let dispositif of dispositifs" [value]="dispositif.id">
+                              {{ dispositif.nom }} - {{ dispositif.marque }} {{ dispositif.modele }}
+                            </option>
+                          </select>
+                          <div *ngIf="submitted && ligne.get('dispositifId')?.errors" class="invalid-feedback">
+                            Dispositif requis
+                          </div>
+                        </td>
+                        
+                        <td>
+                          <input type="number" 
+                                 class="form-control form-control-sm text-center" 
+                                 formControlName="quantite"
+                                 min="1"
+                                 [class.is-invalid]="submitted && ligne.get('quantite')?.errors">
+                          <div *ngIf="submitted && ligne.get('quantite')?.errors" class="invalid-feedback">
+                            Quantité requise
+                          </div>
+                        </td>
+                        
+                        <td>
+                          <div class="input-group input-group-sm">
+                            <input type="number" 
+                                   class="form-control text-end" 
+                                   formControlName="prixUnitaire"
+                                   step="0.01" 
+                                   min="0"
+                                   [class.is-invalid]="submitted && ligne.get('prixUnitaire')?.errors">
+                            <span class="input-group-text">€</span>
+                          </div>
+                          <div *ngIf="submitted && ligne.get('prixUnitaire')?.errors" class="invalid-feedback">
+                            Prix requis
+                          </div>
+                        </td>
+                        
+                        <td>
+                          <div class="input-group input-group-sm">
+                            <input type="number" 
+                                   class="form-control text-end fw-bold amount-field" 
+                                   formControlName="montantLigne"
+                                   readonly>
+                            <span class="input-group-text">€</span>
+                          </div>
+                        </td>
+                        
+                        <td>
+                          <textarea class="form-control form-control-sm" 
+                                    formControlName="description"
+                                    rows="1" 
+                                    placeholder="Description optionnelle"></textarea>
+                        </td>
+                        
+                        <td class="text-center">
+                          <button type="button" 
+                                  class="btn btn-delete-line" 
+                                  (click)="removeLigne(i)"
+                                  [disabled]="lignes.length <= 1"
+                                  title="Supprimer la ligne">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div *ngIf="lignes.length === 0" class="empty-lines">
+                  <div class="empty-lines-content">
+                    <i class="fas fa-inbox empty-icon"></i>
+                    <h6>Aucune ligne de facture</h6>
+                    <p>Cliquez sur "Ajouter une ligne" pour commencer</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Totals and Notes Section -->
+            <div class="form-section mb-5">
+              <div class="row g-4">
+                <div class="col-lg-8">
+                  <div class="notes-card">
+                    <div class="notes-header">
+                      <i class="fas fa-sticky-note me-2"></i>
+                      <span>Observations</span>
+                    </div>
+                    <div class="notes-body">
+                      <textarea class="form-control notes-textarea" 
+                                rows="6" 
+                                formControlName="observations"
+                                placeholder="Notes ou commentaires sur cette facture..."></textarea>
                     </div>
                   </div>
-                  
-                  <div class="card-body p-0">
-                    <div class="table-responsive">
-                      <table class="table table-hover mb-0">
-                        <thead class="thead-light">
-                          <tr>
-                            <th width="25%">Dispositif</th>
-                            <th width="15%">Quantité</th>
-                            <th width="15%">Prix unitaire</th>
-                            <th width="15%">Montant</th>
-                            <th width="25%">Description</th>
-                            <th width="5%">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody formArrayName="lignes">
-                          <tr *ngFor="let ligne of lignes.controls; let i = index" [formGroupName]="i" class="ligne-facture">
-                            <td>
-                              <select
-                                class="form-control form-control-sm"
-                                formControlName="dispositifId"
-                                [class.is-invalid]="submitted && ligne.get('dispositifId') && ligne.get('dispositifId')!.errors">
-                                <option value="">Sélectionner un dispositif</option>
-                                <option *ngFor="let dispositif of dispositifs" [value]="dispositif.id">
-                                  {{ dispositif.nom }} - {{ dispositif.marque }} {{ dispositif.modele }}
-                                </option>
-                              </select>
-                              <div *ngIf="submitted && ligne.get('dispositifId') && ligne.get('dispositifId')!.errors" class="invalid-feedback">
-                                Le dispositif est requis
-                              </div>
-                            </td>
-                            
-                            <td>
-                              <input
-                                type="number"
-                                class="form-control form-control-sm text-center"
-                                formControlName="quantite"
-                                min="1"
-                                [class.is-invalid]="submitted && ligne.get('quantite') && ligne.get('quantite')!.errors">
-                              <div *ngIf="submitted && ligne.get('quantite') && ligne.get('quantite')!.errors" class="invalid-feedback">
-                                Quantité requise
-                              </div>
-                            </td>
-                            
-                            <td>
-                              <div class="input-group input-group-sm">
-                                <input
-                                  type="number"
-                                  class="form-control text-right"
-                                  formControlName="prixUnitaire"
-                                  step="0.01"
-                                  min="0"
-                                  [class.is-invalid]="submitted && ligne.get('prixUnitaire') && ligne.get('prixUnitaire')!.errors">
-                                <div class="input-group-append">
-                                  <span class="input-group-text"> </span>
-                                </div>
-                              </div>
-                              <div *ngIf="submitted && ligne.get('prixUnitaire') && ligne.get('prixUnitaire')!.errors" class="invalid-feedback">
-                                Prix requis
-                              </div>
-                            </td>
-                            
-                            <td>
-                              <div class="input-group input-group-sm">
-                                <input
-                                  type="number"
-                                  class="form-control text-right font-weight-bold"
-                                  formControlName="montantLigne"
-                                  readonly>
-                                <div class="input-group-append">
-                                  <span class="input-group-text">DT </span>
-                                </div>
-                              </div>
-                            </td>
-                            
-                            <td>
-                              <textarea
-                                class="form-control form-control-sm"
-                                formControlName="description"
-                                rows="1"
-                                placeholder="Description optionnelle"></textarea>
-                            </td>
-                            
-                            <td class="text-center">
-                              <button
-                                type="button"
-                                class="btn btn-outline-danger btn-sm"
-                                (click)="removeLigne(i)"
-                                [disabled]="lignes.length <= 1"
-                                title="Supprimer la ligne">
-                                <i class="fas fa-trash"></i>
-                              </button>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                </div>
+                
+                <div class="col-lg-4">
+                  <div class="totals-card">
+                    <div class="totals-header">
+                      <i class="fas fa-calculator me-2"></i>
+                      <span>Récapitulatif</span>
+                    </div>
+                    <div class="totals-body">
+                      <div class="total-line">
+                        <span>Montant HT:</span>
+                        <span class="amount">{{ getMontantHT() | currency:'EUR':'symbol':'1.2-2' }}</span>
+                      </div>
+                      <div class="total-line">
+                        <span>TVA ({{ getTauxTVA() }}%):</span>
+                        <span class="amount">{{ getMontantTVA() | currency:'EUR':'symbol':'1.2-2' }}</span>
+                      </div>
+                      <div class="total-separator"></div>
+                      <div class="total-line total-final">
+                        <span>Total TTC:</span>
+                        <span class="amount-final">{{ getMontantTTC() | currency:'EUR':'symbol':'1.2-2' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <div class="actions-card">
+                <div class="actions-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="form-info">
+                      <i class="fas fa-info-circle me-2"></i>
+                      <small>Les champs marqués d'un astérisque (*) sont obligatoires</small>
                     </div>
                     
-                    <div *ngIf="lignes.length === 0" class="text-center py-4 text-muted">
-                      <i class="fas fa-inbox fa-3x mb-3"></i>
-                      <p>Aucune ligne de facture. Cliquez sur "Ajouter une ligne" pour commencer.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Totaux -->
-            <div class="row mb-4">
-              <div class="col-md-8">
-                <div class="form-group">
-                  <label for="observations" class="form-label font-weight-bold">
-                    <i class="fas fa-sticky-note mr-1"></i>Observations
-                  </label>
-                  <textarea
-                    id="observations"
-                    class="form-control"
-                    rows="4"
-                    formControlName="observations"
-                    placeholder="Notes ou commentaires sur cette facture..."></textarea>
-                </div>
-              </div>
-              
-              <div class="col-md-4">
-                <div class="card bg-light border-0">
-                  <div class="card-header bg-gradient-secondary text-white">
-                    <h6 class="mb-0">
-                      <i class="fas fa-calculator mr-2"></i>Récapitulatif
-                    </h6>
-                  </div>
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                      <span>Montant HT:</span>
-                      <span class="font-weight-bold">{{ getMontantHT() | currency:'EUR':'symbol':'1.2-2' }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                      <span>TVA ({{ getTauxTVA() }}%):</span>
-                      <span class="font-weight-bold">{{ getMontantTVA() | currency:'EUR':'symbol':'1.2-2' }}</span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between">
-                      <span class="h6">Total TTC:</span>
-                      <span class="h5 font-weight-bold text-primary">{{ getMontantTTC() | currency:'EUR':'symbol':'1.2-2' }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="row">
-              <div class="col-12">
-                <div class="card border-0 bg-light">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div class="text-muted">
-                        <small>
-                          <i class="fas fa-info-circle mr-1"></i>
-                          Les champs marqués d'un astérisque (*) sont obligatoires
-                        </small>
-                      </div>
+                    <div class="action-buttons">
+                      <button type="button" 
+                              class="btn btn-cancel" 
+                              (click)="onCancel()"
+                              [disabled]="loading">
+                        <i class="fas fa-times me-2"></i>Annuler
+                      </button>
                       
-                      <div class="btn-group">
-                        <button
-                          type="button"
-                          class="btn btn-outline-secondary btn-lg"
-                          (click)="onCancel()"
-                          [disabled]="loading">
-                          <i class="fas fa-times mr-2"></i>Annuler
-                        </button>
-                        
-                        <button
-                          type="button"
-                          class="btn btn-outline-primary btn-lg"
-                          [disabled]="loading || factureForm.invalid"
-                          (click)="onSaveDraft()">
-                          <i class="fas fa-save mr-2"></i>Sauvegarder brouillon
-                        </button>
-                        
-                        <button
-                          type="submit"
-                          class="btn btn-primary btn-lg"
-                          [disabled]="loading">
-                          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2"></span>
-                          <i *ngIf="!loading" class="fas fa-check mr-2"></i>
-                          {{ isEditMode ? 'Modifier' : 'Créer' }} la facture
-                        </button>
-                      </div>
+                      <button type="button" 
+                              class="btn btn-draft" 
+                              [disabled]="loading || factureForm.invalid"
+                              (click)="onSaveDraft()">
+                        <i class="fas fa-save me-2"></i>Sauvegarder brouillon
+                      </button>
+                      
+                      <button type="submit" 
+                              class="btn btn-submit" 
+                              [disabled]="loading">
+                        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                        <i *ngIf="!loading" class="fas fa-check me-2"></i>
+                        {{ isEditMode ? 'Modifier' : 'Créer' }} la facture
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -349,7 +350,10 @@
 <!-- Loading Overlay -->
 <div *ngIf="loading" class="loading-overlay">
   <div class="loading-content">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
-    <p class="mt-3">{{ isEditMode ? 'Modification' : 'Création' }} en cours...</p>
+    <div class="loading-spinner">
+      <div class="spinner-border text-primary"></div>
+    </div>
+    <h5 class="loading-title">{{ isEditMode ? 'Modification' : 'Création' }} en cours...</h5>
+    <p class="loading-subtitle">Veuillez patienter pendant le traitement</p>
   </div>
 </div>

@@ -1,88 +1,245 @@
 <div class="container">
-  <div class="header">
-    <h2>Gestion des Clients</h2>
-    <div class="button-group">
-      <button mat-raised-button color="primary" (click)="addClient()" *ngIf="canEdit()">
-        <mat-icon> </mat-icon> Nouveau Client
-      </button>
-      <button mat-icon-button color="primary" (click)="refresh()" matTooltip="Actualiser">
-        <mat-icon>Actualiser</mat-icon>
-      </button>
-      <button mat-icon-button color="primary" (click)="exportToCSV()" matTooltip="Exporter en CSV">
-        <mat-icon>Exporter</mat-icon>
-      </button>
-    </div>
-  </div>
-
-  <mat-card>
-    <mat-card-content>
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-label>Rechercher</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Nom, prénom, email...">
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-
-      <div class="table-container">
-        <table mat-table [dataSource]="dataSource" matSort class="full-width">
-
-          <ng-container matColumnDef="id">
-           <th mat-header-cell *matHeaderCellDef mat-sort-header> </th>
-            <td mat-cell *matCellDef="let client"> </td>
-          </ng-container>
-
-          <ng-container matColumnDef="nom">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
-            <td mat-cell *matCellDef="let client">{{ client.nom }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="prenom">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Prénom</th>
-            <td mat-cell *matCellDef="let client">{{ client.prenom }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
-            <td mat-cell *matCellDef="let client">{{ client.email }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="telephone">
-            <th mat-header-cell *matHeaderCellDef>Téléphone</th>
-            <td mat-cell *matCellDef="let client">{{ client.telephone || '-' }}</td>
-          </ng-container>
-
-         
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let client">
-              <button mat-icon-button color="accent" (click)="viewClient(client)" matTooltip="Voir détails">
-                <mat-icon>Voir</mat-icon>
-              </button>
-          
-              <button mat-icon-button color="primary" (click)="editClient(client)" *ngIf="canEdit()" matTooltip="Modifier">
-                <mat-icon> Modifier</mat-icon>
-              </button>
-          
-              <button mat-icon-button color="warn" (click)="deleteClient(client)" *ngIf="canDelete()" matTooltip="Supprimer">
-                <mat-icon>Supprimer</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-          
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-
-        <div *ngIf="loading" class="loading-container">
-          <mat-spinner></mat-spinner>
-        </div>
-
-        <div *ngIf="dataSource.data.length === 0 && !loading" class="no-data">
-          Aucun client trouvé
-        </div>
+    <!-- Header Section -->
+    <div class="header">
+      <h2>Gestion des Clients</h2>
+      <div class="button-group">
+        <button mat-raised-button color="primary" (click)="addClient()" *ngIf="canEdit()">
+          <mat-icon>add</mat-icon> Nouveau Client
+        </button>
+        <button mat-icon-button color="primary" (click)="refresh()" matTooltip="Actualiser">
+          <mat-icon>refresh</mat-icon>
+        </button>
+        <button mat-icon-button color="primary" (click)="exportToCSV()" matTooltip="Exporter en CSV">
+          <mat-icon>download</mat-icon>
+        </button>
       </div>
-
-      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
-    </mat-card-content>
-  </mat-card>
-</div>
+    </div>
+  
+    <!-- Main Content Card -->
+    <mat-card>
+      <mat-card-content>
+        
+        <!-- Search Section -->
+        <div class="search-section">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Recherche générale</mat-label>
+            <input matInput (keyup)="applyFilter($event)" placeholder="Nom, prénom, email, téléphone...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+  
+          <!-- Advanced Search 
+          <div class="advanced-search">
+            <mat-form-field appearance="outline" class="search-nom">
+              <mat-label>Rechercher par nom</mat-label>
+              <input matInput [(ngModel)]="searchNom" (keyup.enter)="searchClients()" placeholder="Nom du client">
+            </mat-form-field>
+  
+            <mat-form-field appearance="outline" class="search-prenom">
+              <mat-label>Rechercher par prénom</mat-label>
+              <input matInput [(ngModel)]="searchPrenom" (keyup.enter)="searchClients()" placeholder="Prénom du client">
+            </mat-form-field>
+  
+            <button mat-raised-button color="accent" (click)="searchClients()" class="search-btn">
+              <mat-icon>search</mat-icon> Rechercher
+            </button>
+          </div>-->
+        </div>
+  
+        <!-- Client Outstanding Balance Section -->
+        <div class="balance-section" *ngIf="selectedClientId && resteAPayer !== null">
+          <mat-card class="balance-card">
+            <mat-card-content>
+              <h3>Reste à payer pour le client sélectionné</h3>
+              <p class="balance-amount">{{ resteAPayer  }} DT</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
+  
+        <!-- Loyal Clients Section 
+        <div class="loyal-clients-section" *ngIf="loyalClients.length > 0">
+          <h3>Clients les plus fidèles</h3>
+          <div class="loyal-clients-list">
+            <mat-chip-list>
+              <mat-chip *ngFor="let client of loyalClients" 
+                       (click)="viewClient(client)" 
+                       class="loyal-client-chip">
+                {{ client.prenom }} {{ client.nom }}
+              </mat-chip>
+            </mat-chip-list>
+          </div>
+        </div>-->
+  
+        <!-- Table Container -->
+        <div class="table-container">
+          <table mat-table [dataSource]="dataSource" matSort class="full-width">
+  
+            <!-- ID Column -->
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+              <td mat-cell *matCellDef="let client">
+                <span class="client-id"> </span>
+              </td>
+            </ng-container>
+  
+            <!-- Nom Column -->
+            <ng-container matColumnDef="nom">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+              <td mat-cell *matCellDef="let client">
+                <div class="client-name">
+                  <strong>{{ client.nom }}</strong>
+                </div>
+              </td>
+            </ng-container>
+  
+            <!-- Prénom Column -->
+            <ng-container matColumnDef="prenom">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Prénom</th>
+              <td mat-cell *matCellDef="let client">
+                <div class="client-firstname">
+                  {{ client.prenom }}
+                </div>
+              </td>
+            </ng-container>
+  
+            <!-- Email Column -->
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+              <td mat-cell *matCellDef="let client">
+                <div class="client-email">
+                  <mat-icon class="email-icon">email</mat-icon>
+                  <a href="mailto:{{ client.email }}" class="email-link">{{ client.email }}</a>
+                </div>
+              </td>
+            </ng-container>
+  
+            <!-- Téléphone Column -->
+            <ng-container matColumnDef="telephone">
+              <th mat-header-cell *matHeaderCellDef>Téléphone</th>
+              <td mat-cell *matCellDef="let client">
+                <div class="client-phone" *ngIf="client.telephone; else noPhone">
+                  <mat-icon class="phone-icon">phone</mat-icon>
+                  <a href="tel:{{ client.telephone }}" class="phone-link">{{ client.telephone }}</a>
+                </div>
+                <ng-template #noPhone>
+                  <span class="no-data">-</span>
+                </ng-template>
+              </td>
+            </ng-container>
+  
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let client">
+                <div class="action-buttons">
+                  <!-- View Button -->
+                  <button mat-icon-button 
+                          color="accent" 
+                          (click)="viewClient(client)" 
+                          matTooltip="Voir détails"
+                          class="action-btn view-btn">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+  
+                  <!-- Get Outstanding Balance Button
+                  <button mat-icon-button 
+                          color="primary" 
+                          (click)="getClientOutstandingBalance(client.id!)" 
+                          matTooltip="Voir reste à payer"
+                          class="action-btn balance-btn">
+                    <mat-icon>account_balance_wallet</mat-icon>
+                  </button> -->
+  
+                  <!-- Edit Button -->
+                  <button mat-icon-button 
+                          color="primary" 
+                          (click)="editClient(client)" 
+                          *ngIf="canEdit()" 
+                          matTooltip="Modifier"
+                          class="action-btn edit-btn">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+  
+                  <!-- Delete Button -->
+                  <button mat-icon-button 
+                          color="warn" 
+                          (click)="deleteClient(client)" 
+                          *ngIf="canDelete()" 
+                          matTooltip="Supprimer"
+                          class="action-btn delete-btn">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+  
+            <!-- Table Rows -->
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                [class.selected-row]="selectedClientId === row.id"
+                (click)="selectedClientId = row.id"></tr>
+          </table>
+  
+          <!-- Loading State -->
+          <div *ngIf="loading" class="loading-container">
+            <mat-spinner diameter="50"></mat-spinner>
+            <p>Chargement des clients...</p>
+          </div>
+  
+          <!-- No Data State -->
+          <div *ngIf="dataSource.data.length === 0 && !loading" class="no-data-container">
+            <mat-icon class="no-data-icon">people_outline</mat-icon>
+            <h3>Aucun client trouvé</h3>
+            <p>Aucun client ne correspond à vos critères de recherche.</p>
+            <button mat-raised-button color="primary" (click)="addClient()" *ngIf="canEdit()">
+              <mat-icon>add</mat-icon> Ajouter le premier client
+            </button>
+          </div>
+        </div>
+  
+        <!-- Pagination -->
+        <mat-paginator 
+          [pageSizeOptions]="[5, 10, 20, 50]" 
+          [pageSize]="10"
+          showFirstLastButtons
+          aria-label="Sélectionner la page des clients">
+        </mat-paginator>
+  
+      </mat-card-content>
+    </mat-card>
+  
+    <!-- Statistics Section 
+    <div class="statistics-section">
+      <mat-card class="stats-card">
+        <mat-card-header>
+          <mat-card-title>Statistiques</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <mat-icon class="stat-icon">people</mat-icon>
+              <div class="stat-content">
+                <span class="stat-number">{{ dataSource.data.length }}</span>
+                <span class="stat-label">Total Clients</span>
+              </div>
+            </div>
+            
+            <div class="stat-item">
+              <mat-icon class="stat-icon">star</mat-icon>
+              <div class="stat-content">
+                <span class="stat-number">{{ loyalClients.length }}</span>
+                <span class="stat-label">Clients Fidèles</span>
+              </div>
+            </div>
+  
+            <div class="stat-item" *ngIf="resteAPayer !== null">
+              <mat-icon class="stat-icon">account_balance_wallet</mat-icon>
+              <div class="stat-content">
+                <span class="stat-number">{{ resteAPayer  }} DT</span>
+                <span class="stat-label">Reste à Payer</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>-->
+  </div>

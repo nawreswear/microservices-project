@@ -2,10 +2,13 @@ server:
   port: 8085
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
+
   application:
     name: auth-service
   datasource:
-    url: jdbc:mysql://localhost:3306/salesapp_auth?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/salesapp_aut?useSSL=false&serverTimezone=UTC
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver

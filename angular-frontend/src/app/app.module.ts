@@ -52,8 +52,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { APP_BASE_HREF } from '@angular/common';
 import { ReglementListComponent } from './components/reglement/reglement-list/reglement-list.component';
 import { DeviseListComponent } from './components/devise/devise-list/devise-list.component';
-import { MatDividerModule, MatMenuModule } from '@angular/material';
+import {  MatDividerModule, MatMenuModule } from '@angular/material';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { MatChipsModule } from '@angular/material/chips';
+
 
 @NgModule({
   declarations: [
@@ -97,6 +99,7 @@ import { UserProfileComponent } from './components/user-profile/user-profile.com
     MatIconModule,
     MatTooltipModule,
     MatDividerModule,
+    MatChipsModule,
   ],
   providers: [
     AuthService,

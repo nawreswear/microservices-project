@@ -6,6 +6,7 @@ import  { Dispositif } from "src/app/models/dispositif.model"
 @Component({
   selector: "app-facture-form",
   templateUrl: "./facture-form.component.html",
+  styleUrls: ["./facture-form.component.scss"]
 })
 export class FactureFormComponent implements OnInit {
   @Input() facture: Facture | null = null
